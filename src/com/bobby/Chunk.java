@@ -8,9 +8,9 @@ import java.util.ArrayList;
 
 public class Chunk {
 
-    PApplet applet;
+    private PApplet applet;
 
-    PShape meshes[];
+    private PShape meshes[];
 
     public TextureManager textureManager;
 

@@ -21,7 +21,7 @@ public class FirstPersonCamera {
     private Point mouse;
     private Point prevMouse;
 
-    float sensitivity = 1f;
+    float sensitivity = 0.15f;
 
     private Robot robot;
 

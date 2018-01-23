@@ -1,8 +1,7 @@
 package com.bobby;
 
-
-import com.jogamp.opengl.GL2;
 import processing.core.PApplet;
+import processing.core.PFont;
 import processing.core.PGraphics;
 import processing.opengl.PGL;
 import processing.opengl.PGraphicsOpenGL;
@@ -11,39 +10,32 @@ import processing.opengl.PJOGL;
 
 
 public class Main extends PApplet{
+    private PGraphics gui;
+    private Chunk chunk;
 
+    PFont font;
 
-    boolean yes = true;
-    float count = 0;
+    private Player player;
 
-    PGraphics gui;
-
-
-
-    Chunk chunk;
-    PJOGL pgl;
-    GL2 gl;
-    Player player;
-
-    int[] fogModes; // storage for 3 types of fogs
-    int currFogFilter = 1;
-
-    float[] fogColor = { 1.0f, 0.0f, 0.0f, 1.0f };
     public void settings(){
         size(1280,720, P3D);
     }
 
     public void setup(){
         PGraphicsOpenGL pg = (PGraphicsOpenGL)g;
-        println(pg.OPENGL_VERSION);
+        println(PGraphicsOpenGL.OPENGL_VERSION);
         chunk = new Chunk(this);
         player = new Player(this, chunk);
         pg.textureSampling(3);
         gui = createGraphics(width, height);
         surface.setResizable(true);
+
+        font = loadFont("VCR48.vlw");
+
     }
 
     public void draw(){
+        PJOGL pgl;
         pgl = (PJOGL) beginPGL();
         pgl.frontFace(PGL.CCW);
         pgl.enable(PGL.CULL_FACE);
@@ -67,12 +59,7 @@ public class Main extends PApplet{
         }
 
         gui.beginDraw();
-        gui.noSmooth();
-        gui.noStroke();
-        gui.background(0, 0);
-        gui.fill(255);
-        gui.rect(width/2-2, height/2-15, 4,30);
-        gui.rect(width/2-15, height/2-2, 30, 4);
+        drawGUI(gui);
         gui.endDraw();
 
         pushMatrix();
@@ -83,8 +70,20 @@ public class Main extends PApplet{
 
     }
 
-    void drawGUI() {
-        text(player.position.x, 0, 0);
+    private void drawGUI(PGraphics graphics) {
+        graphics.noSmooth();
+        gui.noStroke();
+        gui.background(0, 0);
+        gui.fill(255);
+        gui.rect(width/2-2, height/2-15, 4,30);
+        gui.rect(width/2-15, height/2-2, 30, 4);
+        gui.stroke(0);
+        gui.fill(255);
+        gui.textAlign(LEFT, TOP);
+        gui.textFont(font, 16);
+        gui.text("X: " + String.format("%.02f", player.position.x), 10,10);
+        gui.text("Y: " + String.format("%.02f", player.position.y), 10,28);
+        gui.text("Z: " + String.format("%.02f", player.position.z), 10,46);
     }
 
     public void keyPressed(){

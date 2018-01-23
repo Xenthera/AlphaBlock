@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="AlphaBlock:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/AlphaBlock_jar</output-path>
+    <root id="archive" name="AlphaBlock.jar">
+      <element id="module-output" name="AlphaBlock" />
+      <element id="dir-copy" path="$PROJECT_DIR$/Data" />
+      <element id="dir-copy" path="$PROJECT_DIR$/Libraries" />
+    </root>
+  </artifact>
+</component>
