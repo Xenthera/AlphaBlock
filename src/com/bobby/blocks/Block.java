@@ -1,7 +1,7 @@
-package com.bobby;
+package com.bobby.blocks;
 
 
-class Block {
+public class Block {
 
     private int lightLevel;
     BlockSingleTexture texture;

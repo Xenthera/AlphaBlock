@@ -1,11 +1,12 @@
 package com.bobby;
 
+import com.bobby.blocks.*;
 import processing.core.PApplet;
 import processing.core.PShape;
 
 import java.util.ArrayList;
 
-class Chunk {
+public class Chunk {
 
     PApplet applet;
 
@@ -45,13 +46,21 @@ class Chunk {
         for (int x = 0; x < CHUNK_WIDTH; x++) {
             for (int y = 0; y < CHUNK_HEIGHT; y++) {
                 for (int z = 0; z < CHUNK_LENGTH; z++) {
-                    Block block;
-                    if (y < 10) {
-                        block = new BlockDirt();
-                    } else if (y < 100) {
-                        block = new BlockStone();
-                    } else {
-                        block = new BlockStoneBrick();
+                    Block block;;
+                    int r = (int)applet.random(4);
+                    switch (r){
+                        case 0:
+                            block = new BlockStoneBrick();
+                            break;
+                        case 1:
+                            block = new BlockStone();
+                            break;
+                        case 2:
+                            block = new BlockDirt();
+                            break;
+                        default:
+                            block = new BlockAir();
+
                     }
 
                     //block.setLightLevel((int)random(15));
@@ -69,7 +78,9 @@ class Chunk {
         regenerate();
     }
 
-    private Block getBlock(int x, int y, int z) {
+    public Block getBlock(int x, int y, int z) {
+        if(!inBounds(x,y,z))
+            return null;
         int chunkLocation = y / cwidth;
         int blockLocation = y % cwidth;
 
@@ -78,7 +89,10 @@ class Chunk {
         return blocks[x][blockLocation][z];
     }
 
-    private void setBlock(Block block, int x, int y, int z) {
+    public void setBlock(Block block, int x, int y, int z) {
+        if(!inBounds(x,y,z)){
+            return;
+        }
         int chunkLocation = y / cwidth;
         int blockLocation = y % cwidth;
 
@@ -149,7 +163,8 @@ class Chunk {
 
                             meshes[i].tint(this.applet.map(getBlock(x, y, z).getLightLevel(), 0, 15, 50, 255));
                             BlockGeometry.constructBlock(textureManager, getBlock(x, y, z), meshes[i], nx, px, ny, py, nz, pz, x, y, z);
-                        }
+
+                            }
                     }
                 }
                 meshes[i].endShape();
@@ -165,6 +180,19 @@ class Chunk {
             }
         }
         return false;
+    }
+
+    public boolean inBounds(int x, int y, int z){
+        if(!(x >= 0 && x < this.CHUNK_WIDTH)){
+            return false;
+        }
+        if(!(y >= 0 && y < this.CHUNK_HEIGHT)){
+            return false;
+        }
+        if(!(z >= 0 && z < this.CHUNK_LENGTH)){
+            return false;
+        }
+        return true;
     }
 
 

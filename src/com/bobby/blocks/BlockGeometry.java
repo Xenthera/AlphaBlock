@@ -1,16 +1,18 @@
-package com.bobby;
-import processing.core.PVector;
+package com.bobby.blocks;
+
+import com.bobby.TextureManager;
 import processing.core.PShape;
+import processing.core.PVector;
 
 public class BlockGeometry {
-    static PVector[] vertices = {new PVector(-0.5f, -0.5f, -0.5f),
-            new PVector(0.5f, -0.5f, -0.5f),
-            new PVector(0.5f, -0.5f, 0.5f),
-            new PVector(-0.5f, -0.5f, 0.5f),
-            new PVector(-0.5f, 0.5f, -0.5f),
-            new PVector(0.5f, 0.5f, -0.5f),
-            new PVector(0.5f, 0.5f, 0.5f),
-            new PVector(-0.5f, 0.5f, 0.5f)};
+    static PVector[] vertices = {new PVector(0, 0, 0),
+            new PVector(1, 0, 0),
+            new PVector(1, 0, 1),
+            new PVector(0, 0, 1),
+            new PVector(0, 1, 0),
+            new PVector(1, 1, 0),
+            new PVector(1, 1, 1),
+            new PVector(0, 1, 1)};
     
 
     static int[] indices = {

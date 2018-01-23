@@ -1,5 +1,6 @@
-package com.bobby;
-class BlockAir extends Block {
+package com.bobby.blocks;
+
+public class BlockAir extends Block {
 
     public BlockAir() {
         super();

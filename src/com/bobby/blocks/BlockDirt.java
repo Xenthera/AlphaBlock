@@ -1,6 +1,6 @@
-package com.bobby;
+package com.bobby.blocks;
 
-class BlockDirt extends Block {
+public class BlockDirt extends Block {
 
     public BlockDirt() {
         super();

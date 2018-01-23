@@ -1,6 +1,6 @@
-package com.bobby;
+package com.bobby.blocks;
 
-class BlockStone extends Block {
+public class BlockStone extends Block {
 
     public BlockStone() {
         super();

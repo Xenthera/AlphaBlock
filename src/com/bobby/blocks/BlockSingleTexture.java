@@ -1,9 +1,9 @@
-package com.bobby;
+package com.bobby.blocks;
 
-class BlockSingleTexture {
+public class BlockSingleTexture {
 
-    int indexX;
-    int indexY;
+    public int indexX;
+    public int indexY;
 
 
 

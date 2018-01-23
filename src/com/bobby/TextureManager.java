@@ -1,10 +1,11 @@
 package com.bobby;
 
+import com.bobby.blocks.BlockSingleTexture;
 import processing.core.PApplet;
 import processing.core.PImage;
 import processing.core.PVector;
 
-class TextureManager {
+public class TextureManager {
 
     PImage textureAtlas;
 
