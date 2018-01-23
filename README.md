@@ -7,11 +7,12 @@ A voxel engine game
 * Texture atlas support
 * Chunk Support
 * Multiple Blocks Implmented
+* Custom Camera 
+* Player
 
 ### Planned
-* Implment World/Chunk Manager
-* Custom Camera
-* Player class
-* AABB Physics
+* Implement World/Chunk Manager
+* AABB Physics for Player
+* Terrain Generation
 
 
