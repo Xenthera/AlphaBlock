@@ -6,7 +6,7 @@ A voxel engine game
 * Occluded faces
 * Texture atlas support
 * Chunk Support
-* Multiple Blocks Implmented
+* Multiple Blocks Implemented
 * Custom Camera 
 * Player
 
