@@ -11,8 +11,8 @@ A voxel engine game
 * Player
 
 ### Planned
-* Implement World/Chunk Manager
+* Chunk Manager
 * AABB Physics for Player
-* Terrain Generation
+* Better Terrain Generation
 
 
