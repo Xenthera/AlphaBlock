@@ -3,6 +3,7 @@ package com.bobby;
 import com.bobby.blocks.*;
 import processing.core.PApplet;
 import processing.core.PShape;
+import processing.core.PVector;
 
 import java.util.ArrayList;
 
@@ -14,17 +15,23 @@ public class Chunk {
 
     public TextureManager textureManager;
 
+    public PVector position;
+
+    private World world;
+
     public final int CHUNK_WIDTH = 16, CHUNK_LENGTH = 16, CHUNK_HEIGHT = 128;
     private final int cwidth = 16, clength = 16, cheight = 16;
     private final int chunkStackHeight = CHUNK_HEIGHT / cheight; // 16 * 8 = 128;
-    private final int MAX_CHUNK_UPDATES = 8; // per frame
 
     ArrayList<Block[][][]> subChunks;
 
     boolean[] subChunkDirtyList; // Flag to check if subchunk needs rebuilding
 
 
-    public Chunk(PApplet applet) {
+    public Chunk(PApplet applet, World world, int x, int y) {
+        this.world = world;
+        this.position = new PVector(x, 0, y);
+
 
         this.applet = applet;
 
@@ -42,45 +49,53 @@ public class Chunk {
             subChunkDirtyList[i] = true;
         }
 
-        //TEMPORARY: Generate full chunk
-        for (int x = 0; x < CHUNK_WIDTH; x++) {
-            for (int y = 0; y < CHUNK_HEIGHT; y++) {
-                for (int z = 0; z < CHUNK_LENGTH; z++) {
-                    Block block;;
-                    int r = (int)applet.random(4);
-                    switch (r){
-                        case 0:
-                            block = new BlockStoneBrick();
-                            break;
-                        case 1:
-                            block = new BlockStone();
-                            break;
-                        case 2:
-                            block = new BlockDirt();
-                            break;
-                        default:
-                            block = new BlockAir();
-
-                    }
-
-                    //block.setLightLevel((int)random(15));
-                    setBlock(block, x, y, z);
+        for (int i = 0; i < CHUNK_WIDTH; i++) {
+            for (int j = 0; j < CHUNK_LENGTH; j++) {
+                for (int k = 0; k < CHUNK_HEIGHT; k++) {
+                    setBlock(new BlockAir(), i, k, j, false);
                 }
+
             }
         }
 
+        //TEMPORARY: Generate full chunk
+        int topLayerDepth = 2;
 
+        for (int i = 0; i < CHUNK_WIDTH; i++) {
+            for (int j = 0; j < CHUNK_LENGTH; j++) {
+                int yTop = (int) (applet.noise((this.position.x * 16 + i) * 0.02f,
+                        (this.position.z * 16 + j) * 0.02f) * 127) + 1;
+                for (int k = yTop + 1; k < CHUNK_HEIGHT; k++) {
+                    setBlock(new BlockDirt(), i, k, j, false);
+                }
+                for (int k = 0; k < topLayerDepth; k++) {
 
+                    if (yTop > 80) {
+                        setBlock(new BlockSand(), i, yTop + k, j, false);
+                    } else {
+                        setBlock(new BlockGrass(), i, yTop + k, j, false);
+                    }
 
+                    if(applet.random(1) > 0.9999f){
+                        createPillar(i, yTop, j);
+                    }
 
+                }
+            }
+        }
+    }
 
-
-        regenerate();
+    private void createPillar(int x, int y, int z){
+        int height = 16;
+        for (int k = 0; k < height; k++) {
+            setBlock(new BlockStoneBrick(), x, y - height + k, z, false);
+            setBlock(new BlockStoneBrick(), x + 1, y - height + k, z, false);
+            setBlock(new BlockStoneBrick(), x, y - height + k, z + 1, false);
+            setBlock(new BlockStoneBrick(), x + 1, y - height + k, z + 1, false);
+        }
     }
 
     public Block getBlock(int x, int y, int z) {
-        if(!inBounds(x,y,z))
-            return null;
         int chunkLocation = y / cwidth;
         int blockLocation = y % cwidth;
 
@@ -89,12 +104,13 @@ public class Chunk {
         return blocks[x][blockLocation][z];
     }
 
-    public void setBlock(Block block, int x, int y, int z) {
-        if(!inBounds(x,y,z)){
-            return;
-        }
+    public void setBlock(Block block, int x, int y, int z, boolean setByUser) {
         int chunkLocation = y / cwidth;
         int blockLocation = y % cwidth;
+
+        if(x < 0 || y < 0 || z < 0 || x > cwidth - 1 || y > 128 - 1 || z > clength - 1){
+            return;
+        }
 
         Block[][][] blocks = subChunks.get(chunkLocation);
 
@@ -110,91 +126,109 @@ public class Chunk {
         if (subChunkDirtyList[chunkLocation] == false) {
             subChunkDirtyList[chunkLocation] = true;
         }
+        PVector worldSpace = toWorldSpace(x,y,z);
+        // If the block was placed by a user, update the neighboring chunks if on the edge of a chunk.
+        if(setByUser) {
+            if (x == 0) {
+                if (world.getBlock((int) worldSpace.x - 1, y, (int) worldSpace.z).isSolid()) {
+                    world.getChunk((int)this.position.x - 1, (int)this.position.z).subChunkDirtyList[chunkLocation] = true;
+                }
+            }
+            if (x == cwidth - 1) {
+                if (world.getBlock((int) worldSpace.x + 1, y, (int) worldSpace.z).isSolid()) {
+                    world.getChunk((int)this.position.x + 1, (int)this.position.z).subChunkDirtyList[chunkLocation] = true;
+                    applet.println("X positive edge");
+                }
+            }
+            if (z == 0) {
+                if (world.getBlock((int) worldSpace.x, y, (int) worldSpace.z - 1).isSolid()) {
+                    world.getChunk((int)this.position.x, (int)this.position.z - 1).subChunkDirtyList[chunkLocation] = true;
+                }
+            }
+            if (z == clength - 1) {
+                if (world.getBlock((int) worldSpace.x, y, (int) worldSpace.z + 1).isSolid()) {
+                    world.getChunk((int)this.position.x, (int)this.position.z + 1).subChunkDirtyList[chunkLocation] = true;
+                }
+            }
+        }
     }
 
-    public void removeBlock(int x, int y, int z) {
-        this.setBlock(new BlockAir(), x, y, z);
+    public PVector toWorldSpace(int x, int y, int z){
+        return new PVector((int)(x + (this.position.x * cwidth)), y, (int)(z + (this.position.z * cwidth)));
+    }
+
+    public void removeBlock(int x, int y, int z, boolean setByUser) {
+        this.setBlock(new BlockAir(), x, y, z, setByUser);
     }
 
     public void regenerate() {
-        int updateCount = 0;
         boolean faceDefault = true;
         for (int i = 0; i < chunkStackHeight; i++) {
-            if (subChunkDirtyList[i] == true && updateCount < MAX_CHUNK_UPDATES) { // If the chunk is dirty?
-                updateCount++;
+            if (subChunkDirtyList[i] == true) { // If the chunk is dirty?
                 meshes[i] = null;
                 meshes[i] = this.applet.createShape();
                 meshes[i].beginShape(this.applet.TRIANGLE);
                 meshes[i].texture(textureManager.getTextureAtlas());
-
-
                 meshes[i].noStroke();
                 for (int x = 0; x < cwidth; x++) {
                     for (int y = 0 + (i * cheight); y < cheight + (i * cheight); y++) {
                         for (int z = 0; z < clength; z++) {
 
-                            if (getBlock(x, y, z).isSolid() == false) {
+                            PVector worldSpace = toWorldSpace(x,y,z);
+                            int worldX = (int)worldSpace.x;
+                            int worldZ = (int)worldSpace.z;
+
+                            if (world.getBlock(worldX, y, worldZ).isSolid() == false) {
                                 continue;
                             }
                             boolean nx = faceDefault;
-                            if (x > 0) {
-                                nx = !getBlock(x-1, y, z).isSolid();
+                            if (worldX > 0) {
+                                nx = !world.getBlock(worldX - 1, y, worldZ).isSolid();
                             }
                             boolean px = faceDefault;
-                            if (x < CHUNK_WIDTH - 1) {
-                                px = !getBlock(x+1, y, z).isSolid();
+                            if (worldX < world.chunkWidth * CHUNK_WIDTH - 1) {
+                                px = !world.getBlock(worldX + 1, y, worldZ).isSolid();
                             }
                             boolean ny = faceDefault;
                             if (y > 0) {
-                                ny = !getBlock(x, y-1, z).isSolid();
+                                ny = !world.getBlock(worldX, y - 1, worldZ).isSolid();
                             }
                             boolean py = faceDefault;
                             if (y < CHUNK_HEIGHT - 1) {
-                                py = !getBlock(x, y+1, z).isSolid();
+                                py = !world.getBlock(worldX, y + 1, worldZ).isSolid();
                             }
                             boolean nz = faceDefault;
-                            if (z > 0) {
-                                nz = !getBlock(x, y, z-1).isSolid();
+                            if (worldZ > 0) {
+                                nz = !world.getBlock(worldX, y, worldZ - 1).isSolid();
                             }
                             boolean pz = faceDefault;
-                            if (z < CHUNK_LENGTH - 1) {
-                                pz = !getBlock(x, y, z+1).isSolid();
+                            if (worldZ < world.chunkLength * CHUNK_LENGTH - 1) {
+                                pz = !world.getBlock(worldX, y, worldZ + 1).isSolid();
                             }
 
-                            meshes[i].tint(this.applet.map(getBlock(x, y, z).getLightLevel(), 0, 15, 50, 255));
-                            BlockGeometry.constructBlock(textureManager, getBlock(x, y, z), meshes[i], nx, px, ny, py, nz, pz, x, y, z);
-
+                            if(y == CHUNK_HEIGHT-1){
+                                py = false;
                             }
+                            meshes[i].tint(this.applet.map(world.getBlock(x, y, z).getLightLevel(), 0, 15, 50, 255));
+                            BlockGeometry.constructBlock(textureManager, world.getBlock(worldX, y, worldZ), meshes[i], nx, px, ny, py, nz, pz, x, y, z);
+                        }
                     }
                 }
-                meshes[i].endShape();
-                subChunkDirtyList[i] = false; // All clean!
             }
+            meshes[i].endShape();
+            subChunkDirtyList[i] = false; // All clean!
         }
     }
 
+
     private boolean isDirty() {
-        for (int i = 0; i <  subChunkDirtyList.length; i++) {
+        for (int i = 0; i < subChunkDirtyList.length; i++) {
             if (subChunkDirtyList[i] == true) {
                 return true;
             }
         }
         return false;
     }
-
-    public boolean inBounds(int x, int y, int z){
-        if(!(x >= 0 && x < this.CHUNK_WIDTH)){
-            return false;
-        }
-        if(!(y >= 0 && y < this.CHUNK_HEIGHT)){
-            return false;
-        }
-        if(!(z >= 0 && z < this.CHUNK_LENGTH)){
-            return false;
-        }
-        return true;
-    }
-
 
 
     public void draw() {

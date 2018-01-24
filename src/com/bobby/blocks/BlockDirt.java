@@ -4,6 +4,6 @@ public class BlockDirt extends Block {
 
     public BlockDirt() {
         super();
-        texture = new BlockSingleTexture(1, 14);
+        texture = new BlockSingleTexture(2, 0);
     }
 }

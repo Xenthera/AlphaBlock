@@ -10,15 +10,16 @@ public class Player {
     public FirstPersonCamera camera;
     PVector position;
     public PApplet app;
-    Chunk chunk;
-    RayCaster rayCaster;
 
-    public Player(PApplet app, Chunk chunk) {
+    RayCaster rayCaster;
+    World world;
+
+    public Player(PApplet app, World world) {
+        this.world = world;
         this.camera = new FirstPersonCamera(app);
         this.position = this.camera.getPosition();
-        this.chunk = chunk;
         this.app = app;
-        rayCaster = new RayCaster(this.app, this.chunk);
+        rayCaster = new RayCaster(this.app, this.world);
 
     }
 
@@ -57,6 +58,13 @@ public class Player {
 
     }
 
+    public void setPosition(float x, float y, float z){
+        this.position.x = x;
+        this.position.y = y;
+        this.position.z = z;
+
+    }
+
 
     public void mousePressed(){
 
@@ -68,14 +76,15 @@ public class Player {
         if (camera.isMouseFocused) {
             if (ray.hasTarget()) {
                 if (app.mouseButton == app.LEFT) {
-                    chunk.removeBlock((int) position.x, (int) position.y, (int) position.z);
+                    world.removeBlock((int) position.x, (int) position.y, (int) position.z, true);
                 } else if (app.mouseButton == app.RIGHT) {
-                    chunk.setBlock(new BlockStoneBrick(), (int)position.x + (int)normal.x, (int) position.y + (int)normal.y, (int) position.z + (int)normal.z);
+                    world.setBlock(new BlockStoneBrick(), (int)position.x + (int)normal.x, (int) position.y + (int)normal.y, (int) position.z + (int)normal.z, true);
                 }
             }
         }
 
         if(camera.isMouseFocused == false){
+            camera.centerMouse();
             camera.isMouseFocused = true;
         }
     }

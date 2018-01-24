@@ -4,6 +4,6 @@ public class BlockStoneBrick extends Block {
 
     public BlockStoneBrick() {
         super();
-        texture = new BlockSingleTexture(1,11);
+        texture = new BlockSingleTexture(6,3);
     }
 }

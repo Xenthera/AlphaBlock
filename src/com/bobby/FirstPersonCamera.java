@@ -23,7 +23,7 @@ public class FirstPersonCamera {
 
     float sensitivity = 0.15f;
 
-    private Robot robot;
+    public Robot robot;
 
     public float tilt, pan;
 
@@ -56,8 +56,13 @@ public class FirstPersonCamera {
 
     }
 
-    public void resetCursor(){
+    public void centerMouse(){
+        int x = ((GLWindow) app.getSurface().getNative()).getX();
+        int y = ((GLWindow) app.getSurface().getNative()).getY();
+        int w = app.width;
+        int h = app.height;
 
+        robot.mouseMove(w / 2 + x, h / 2 + y);
     }
 
     public void draw(){
@@ -79,8 +84,8 @@ public class FirstPersonCamera {
             int deltaY = mouse.y - middleY;
 
             app.noCursor();
-            robot.mouseMove(w / 2 + x, h / 2 + y);
 
+            centerMouse();
 
             pan += PApplet.map(deltaX, 0, app.width, 0, PConstants.TWO_PI) * sensitivity;
             tilt += PApplet.map(deltaY, 0, app.height, 0, PConstants.PI) * sensitivity;

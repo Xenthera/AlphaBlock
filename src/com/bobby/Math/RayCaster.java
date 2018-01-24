@@ -1,16 +1,18 @@
 package com.bobby.Math;
 
 import com.bobby.Chunk;
+import com.bobby.World;
+import com.bobby.blocks.Block;
 import processing.core.PApplet;
 import processing.core.PVector;
 
 public class RayCaster {
 
-    Chunk chunk;
+    World world;
     PApplet app;
 
-    public RayCaster(PApplet app, Chunk chunk) {
-        this.chunk = chunk;
+    public RayCaster(PApplet app, World world) {
+        this.world = world;
         this.app = app;
     }
 
@@ -97,47 +99,52 @@ public class RayCaster {
         while (t <= maxDistance) {
 
             // exit check
-            boolean b = chunk.inBounds(ix, iy, iz);
-            if (b && chunk.getBlock(ix, iy, iz).isSolid()) {
-                ray.hitPostition.x = ix;
-                ray.hitPostition.y = iy;
-                ray.hitPostition.z = iz;
 
-                if (steppedIndex == 0) ray.hitNormal.x = -stepx;
-                if (steppedIndex == 1) ray.hitNormal.y = -stepy;
-                if (steppedIndex == 2) ray.hitNormal.z = -stepz;
-                ray.hitTarget = true;
-                return ray;
+                Block block = this.world.getBlock(ix,iy,iz);
+                if(block == null){
+
+                }else {
+
+                    if (this.world.getBlock(ix, iy, iz).isSolid()) {
+                        ray.hitPostition.x = ix;
+                        ray.hitPostition.y = iy;
+                        ray.hitPostition.z = iz;
+
+                        if (steppedIndex == 0) ray.hitNormal.x = -stepx;
+                        if (steppedIndex == 1) ray.hitNormal.y = -stepy;
+                        if (steppedIndex == 2) ray.hitNormal.z = -stepz;
+                        ray.hitTarget = true;
+                        return ray;
+                    }
+                }
+                // advance t to next nearest voxel boundary
+                if (txMax < tyMax) {
+                    if (txMax < tzMax) {
+                        ix += stepx;
+                        t = txMax;
+                        txMax += txDelta;
+                        steppedIndex = 0;
+                    } else {
+                        iz += stepz;
+                        t = tzMax;
+                        tzMax += tzDelta;
+                        steppedIndex = 2;
+                    }
+                } else {
+                    if (tyMax < tzMax) {
+                        iy += stepy;
+                        t = tyMax;
+                        tyMax += tyDelta;
+                        steppedIndex = 1;
+                    } else {
+                        iz += stepz;
+                        t = tzMax;
+                        tzMax += tzDelta;
+                        steppedIndex = 2;
+                    }
+                }
             }
 
-            // advance t to next nearest voxel boundary
-            if (txMax < tyMax) {
-                if (txMax < tzMax) {
-                    ix += stepx;
-                    t = txMax;
-                    txMax += txDelta;
-                    steppedIndex = 0;
-                } else {
-                    iz += stepz;
-                    t = tzMax;
-                    tzMax += tzDelta;
-                    steppedIndex = 2;
-                }
-            } else {
-                if (tyMax < tzMax) {
-                    iy += stepy;
-                    t = tyMax;
-                    tyMax += tyDelta;
-                    steppedIndex = 1;
-                } else {
-                    iz += stepz;
-                    t = tzMax;
-                    tzMax += tzDelta;
-                    steppedIndex = 2;
-                }
-            }
-
-        }
 
         ray.hitTarget = false;
         return ray;

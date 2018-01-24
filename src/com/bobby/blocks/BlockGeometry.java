@@ -51,12 +51,12 @@ public class BlockGeometry {
     }
 
     private static void constructBack(TextureManager manager, Block block, PShape shape, int  x, int y, int z) {
-        shape.vertex(vertices[indices[0]-1].x + x, vertices[indices[0]-1].y + y, vertices[indices[0]-1].z + z, 15.85f +  manager.getTextureIndex(block.texture).x, 0.15f + manager.getTextureIndex(block.texture).y);
-        shape.vertex(vertices[indices[1]-1].x + x, vertices[indices[1]-1].y + y, vertices[indices[1]-1].z + z, 0.15f + manager.getTextureIndex(block.texture).x, 0.15f + manager.getTextureIndex(block.texture).y);
-        shape.vertex(vertices[indices[2]-1].x + x, vertices[indices[2]-1].y + y, vertices[indices[2]-1].z + z, 0.15f + manager.getTextureIndex(block.texture).x, 15.85f +  manager.getTextureIndex(block.texture).y);
-        shape.vertex(vertices[indices[3]-1].x + x, vertices[indices[3]-1].y + y, vertices[indices[3]-1].z + z, 15.85f +  manager.getTextureIndex(block.texture).x, 0.15f + manager.getTextureIndex(block.texture).y);
-        shape.vertex(vertices[indices[4]-1].x + x, vertices[indices[4]-1].y + y, vertices[indices[4]-1].z + z, 0.15f + manager.getTextureIndex(block.texture).x, 15.85f +  manager.getTextureIndex(block.texture).y);
-        shape.vertex(vertices[indices[5]-1].x + x, vertices[indices[5]-1].y + y, vertices[indices[5]-1].z + z, 15.85f +  manager.getTextureIndex(block.texture).x, 15.85f +  manager.getTextureIndex(block.texture).y);
+        shape.vertex(vertices[indices[0]-1].x + x, vertices[indices[0]-1].y + y, vertices[indices[0]-1].z + z, 15.85f + manager.getTextureIndex(block.texture).x, 0.15f  + manager.getTextureIndex(block.texture).y);
+        shape.vertex(vertices[indices[1]-1].x + x, vertices[indices[1]-1].y + y, vertices[indices[1]-1].z + z, 0.15f  + manager.getTextureIndex(block.texture).x, 0.15f  + manager.getTextureIndex(block.texture).y);
+        shape.vertex(vertices[indices[2]-1].x + x, vertices[indices[2]-1].y + y, vertices[indices[2]-1].z + z, 0.15f  + manager.getTextureIndex(block.texture).x, 15.85f + manager.getTextureIndex(block.texture).y);
+        shape.vertex(vertices[indices[3]-1].x + x, vertices[indices[3]-1].y + y, vertices[indices[3]-1].z + z, 15.85f + manager.getTextureIndex(block.texture).x, 0.15f  + manager.getTextureIndex(block.texture).y);
+        shape.vertex(vertices[indices[4]-1].x + x, vertices[indices[4]-1].y + y, vertices[indices[4]-1].z + z, 0.15f  + manager.getTextureIndex(block.texture).x, 15.85f + manager.getTextureIndex(block.texture).y);
+        shape.vertex(vertices[indices[5]-1].x + x, vertices[indices[5]-1].y + y, vertices[indices[5]-1].z + z, 15.85f + manager.getTextureIndex(block.texture).x, 15.85f + manager.getTextureIndex(block.texture).y);
     }
 
     private static void constructRight(TextureManager manager, Block block, PShape shape, int  x, int y, int z) {

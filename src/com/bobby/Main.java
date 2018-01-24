@@ -3,6 +3,7 @@ package com.bobby;
 import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PGraphics;
+import processing.core.PVector;
 import processing.opengl.PGL;
 import processing.opengl.PGraphicsOpenGL;
 import processing.opengl.PJOGL;
@@ -11,7 +12,7 @@ import processing.opengl.PJOGL;
 
 public class Main extends PApplet{
     private PGraphics gui;
-    private Chunk chunk;
+    private World world;
 
     PFont font;
 
@@ -24,18 +25,36 @@ public class Main extends PApplet{
     public void setup(){
         PGraphicsOpenGL pg = (PGraphicsOpenGL)g;
         println(PGraphicsOpenGL.OPENGL_VERSION);
-        chunk = new Chunk(this);
-        player = new Player(this, chunk);
+        background(0);
+
+        world = new World(this);
+        player = new Player(this, world);
+
         pg.textureSampling(3);
         gui = createGraphics(width, height);
         surface.setResizable(true);
 
         font = loadFont("VCR48.vlw");
+        textFont(font, 45);
+        textAlign(CENTER, CENTER);
+        text("LOADING",width/2,height/2);
+
+
+
+
+
 
     }
 
     public void draw(){
+        if(!world.isLoaded){
+            world.load();
+            player.camera.centerMouse();
+            PVector spawn = world.getRandomSpawnPoint();
+            player.setPosition(spawn.x - 0.5f, spawn.y - 1.5f, spawn.z - 0.5f);
+        }
         PJOGL pgl;
+
         pgl = (PJOGL) beginPGL();
         pgl.frontFace(PGL.CCW);
         pgl.enable(PGL.CULL_FACE);
@@ -48,7 +67,7 @@ public class Main extends PApplet{
 
         perspective(radians(90), (float)width/(float)height, 0.1f, 1000);
 
-        chunk.draw();
+        world.draw();
         player.draw();
 
         //gl.glDisable(gl.GL_FOG);
@@ -71,7 +90,7 @@ public class Main extends PApplet{
     }
 
     private void drawGUI(PGraphics graphics) {
-        graphics.noSmooth();
+        //graphics.noSmooth();
         gui.noStroke();
         gui.background(0, 0);
         gui.fill(255);
@@ -81,26 +100,15 @@ public class Main extends PApplet{
         gui.fill(255);
         gui.textAlign(LEFT, TOP);
         gui.textFont(font, 16);
-        gui.text("X: " + String.format("%.02f", player.position.x), 10,10);
-        gui.text("Y: " + String.format("%.02f", player.position.y), 10,28);
-        gui.text("Z: " + String.format("%.02f", player.position.z), 10,46);
+        gui.text("FPS: " + (int)frameRate, 10, 10);
+        gui.text("X: " + String.format("%.02f", player.position.x), 10,28);
+        gui.text("Y: " + String.format("%.02f", player.position.y), 10,46);
+        gui.text("Z: " + String.format("%.02f", player.position.z), 10,64);
     }
 
     public void keyPressed(){
         player.keyPressed();
-        if(keyCode == 72) {
-            for (int x = 0; x < chunk.CHUNK_WIDTH; x++) {
-                for (int y = 0; y < chunk.CHUNK_HEIGHT; y++) {
-                    for (int z = 0; z < chunk.CHUNK_LENGTH; z++) {
-                        if (y > 0 && y < chunk.CHUNK_HEIGHT - 1 && z > 0 && z < chunk.CHUNK_LENGTH - 1) {
-
-                            chunk.removeBlock(x, y, z);
-
-                        }
-                    }
-                }
-            }
-        }else if(key == 't'){
+        if(key == 't'){
             player.camera.isMouseFocused = false;
         }
     }
