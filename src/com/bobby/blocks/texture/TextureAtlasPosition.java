@@ -1,8 +1,8 @@
-package com.bobby.blocks.construction;
+package com.bobby.blocks.texture;
 
 public class TextureAtlasPosition {
 
-    float minX, minY, maxX, maxY;
+    public float minX, minY, maxX, maxY;
 
     public TextureAtlasPosition(float minX, float minY, float maxX, float maxY){
         this.minX = minX;

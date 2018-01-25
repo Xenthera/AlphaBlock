@@ -1,7 +1,6 @@
 package com.bobby;
 
-import com.bobby.blocks.construction.BlockSingleTexture;
-import com.bobby.blocks.construction.TextureAtlasPosition;
+import com.bobby.blocks.texture.TextureAtlasPosition;
 import processing.core.PApplet;
 import processing.core.PImage;
 
@@ -21,13 +20,13 @@ public class TextureManager {
         return this.textureAtlas;
     }
 
-    public TextureAtlasPosition getTextureIndex(BlockSingleTexture textureIndex){
+    public TextureAtlasPosition getTextureIndex(int[] pos){
         float texturePerRow = (float)imageSize / (float)individualTextureSize;
         float indvTexSize = 1.0f / texturePerRow;
         float pixelSize = 1.0f / (float)imageSize;
 
-        float xMin = (textureIndex.indexX * indvTexSize) + 0.0f * pixelSize;
-        float yMin = (textureIndex.indexY * indvTexSize) + 0.0f * pixelSize;
+        float xMin = (pos[0] * indvTexSize) + 0.0f * pixelSize;
+        float yMin = (pos[1] * indvTexSize) + 0.0f * pixelSize;
 
         float xMax = (xMin + indvTexSize) - 0.0f * pixelSize;
         float yMax = (yMin + indvTexSize) - 0.0f * pixelSize;

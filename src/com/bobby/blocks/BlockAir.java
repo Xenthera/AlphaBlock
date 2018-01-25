@@ -9,4 +9,5 @@ public class BlockAir extends Block {
     public boolean isSolid() {
         return false;
     }
+    public boolean isOpaque() { return false; }
 }

@@ -60,25 +60,25 @@ public class Chunk {
         }
 
         //TEMPORARY: Generate full chunk
-        int topLayerDepth = 2;
+        int topLayerDepth = 1;
 
         for (int i = 0; i < CHUNK_WIDTH; i++) {
             for (int j = 0; j < CHUNK_LENGTH; j++) {
                 int yTop = (int) (applet.noise((this.position.x * 16 + i) * 0.02f,
-                        (this.position.z * 16 + j) * 0.02f) * 127) + 1;
+                        (this.position.z * 16 + j) * 0.02f) * 45) + 64;
                 for (int k = yTop + 1; k < CHUNK_HEIGHT; k++) {
                     setBlock(new BlockDirt(), i, k, j, false);
                 }
                 for (int k = 0; k < topLayerDepth; k++) {
 
-                    if (yTop > 80) {
+                    if (yTop > 100) {
                         setBlock(new BlockSand(), i, yTop + k, j, false);
                     } else {
                         setBlock(new BlockGrass(), i, yTop + k, j, false);
                     }
 
-                    if(applet.random(1) > 0.9999f){
-                        createPillar(i, yTop, j);
+                    if(applet.random(1) > 0.975f && !(getBlock(i, yTop, j).getName().equals("Sand"))){
+                        createTree(i, yTop, j);
                     }
 
                 }
@@ -86,14 +86,20 @@ public class Chunk {
         }
     }
 
-    private void createPillar(int x, int y, int z){
-        int height = 16;
+    private void createTree(int x, int y, int z){
+        int height = (int)applet.random(4,8);
         for (int k = 0; k < height; k++) {
-            setBlock(new BlockStoneBrick(), x, y - height + k, z, false);
-            setBlock(new BlockStoneBrick(), x + 1, y - height + k, z, false);
-            setBlock(new BlockStoneBrick(), x, y - height + k, z + 1, false);
-            setBlock(new BlockStoneBrick(), x + 1, y - height + k, z + 1, false);
+            if(k < height / 2){
+                for (int treeWidth = (k == height / 2 - 1 ? -2 : -1); treeWidth <= (k == height / 2 - 1 ? 2 : 1); treeWidth++) {
+                    for (int treeLength = (k == height / 2 - 1 ? -2 : -1); treeLength <= (k == height / 2 - 1 ? 2 : 1); treeLength++) {
+                        setBlock(new BlockOakLeaves(), x + treeWidth, y - height + k, z + treeLength, false);
+                    }
+                }
+            }
+            setBlock(new BlockOak(), x, y - height + k, z, false);
         }
+        setBlock(new BlockOakLeaves(), x, y - height - 1, z, false);
+
     }
 
     public Block getBlock(int x, int y, int z) {
@@ -182,36 +188,40 @@ public class Chunk {
                             if (world.getBlock(worldX, y, worldZ).isSolid() == false) {
                                 continue;
                             }
-                            boolean nx = faceDefault;
-                            if (worldX > 0) {
-                                nx = !world.getBlock(worldX - 1, y, worldZ).isSolid();
-                            }
-                            boolean px = faceDefault;
-                            if (worldX < world.chunkWidth * CHUNK_WIDTH - 1) {
-                                px = !world.getBlock(worldX + 1, y, worldZ).isSolid();
-                            }
-                            boolean ny = faceDefault;
-                            if (y > 0) {
-                                ny = !world.getBlock(worldX, y - 1, worldZ).isSolid();
-                            }
-                            boolean py = faceDefault;
-                            if (y < CHUNK_HEIGHT - 1) {
-                                py = !world.getBlock(worldX, y + 1, worldZ).isSolid();
-                            }
-                            boolean nz = faceDefault;
-                            if (worldZ > 0) {
-                                nz = !world.getBlock(worldX, y, worldZ - 1).isSolid();
-                            }
-                            boolean pz = faceDefault;
-                            if (worldZ < world.chunkLength * CHUNK_LENGTH - 1) {
-                                pz = !world.getBlock(worldX, y, worldZ + 1).isSolid();
-                            }
 
-                            if(y == CHUNK_HEIGHT-1){
-                                py = false;
-                            }
+                                boolean nx = faceDefault;
+                                if (worldX > 0) {
+                                    nx = !world.getBlock(worldX - 1, y, worldZ).isSolid();
+                                }
+                                boolean px = faceDefault;
+                                if (worldX < world.chunkWidth * CHUNK_WIDTH - 1) {
+                                    px = !world.getBlock(worldX + 1, y, worldZ).isSolid();
+                                }
+                                boolean ny = faceDefault;
+                                if (y > 0) {
+                                    ny = !world.getBlock(worldX, y - 1, worldZ).isSolid();
+                                }
+                                boolean py = faceDefault;
+                                if (y < CHUNK_HEIGHT - 1) {
+                                    py = !world.getBlock(worldX, y + 1, worldZ).isSolid();
+                                }
+                                boolean nz = faceDefault;
+                                if (worldZ > 0) {
+                                    nz = !world.getBlock(worldX, y, worldZ - 1).isSolid();
+                                }
+                                boolean pz = faceDefault;
+                                if (worldZ < world.chunkLength * CHUNK_LENGTH - 1) {
+                                    pz = !world.getBlock(worldX, y, worldZ + 1).isSolid();
+                                }
+
+                                if (y == CHUNK_HEIGHT - 1) {
+                                    py = false;
+                                }
+
+                                BlockGeometry.constructBlock(textureManager, world.getBlock(worldX, y, worldZ), meshes[i], nx, px, ny, py, nz, pz, x, y, z);
+
                             //meshes[i].tint(this.applet.map(world.getBlock(x, y, z).getLightLevel(), 0, 15, 50, 255));
-                            BlockGeometry.constructBlock(textureManager, world.getBlock(worldX, y, worldZ), meshes[i], nx, px, ny, py, nz, pz, x, y, z);
+
                         }
                     }
                 }

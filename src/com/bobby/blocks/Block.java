@@ -1,12 +1,14 @@
 package com.bobby.blocks;
 
 
-import com.bobby.blocks.construction.BlockSingleTexture;
+import com.bobby.blocks.texture.BlockSimpleMultiTexture;
 
 public class Block {
 
     private int lightLevel;
-    public BlockSingleTexture texture;
+    public BlockSimpleMultiTexture texture;
+
+    protected String name = "genericBlockName";
 
     public Block() {
         this.lightLevel = 15;
@@ -26,5 +28,12 @@ public class Block {
 
     public boolean isSolid() {
         return true;
+    }
+    public boolean isOpaque(){
+        return true;
+    }
+
+    public String getName(){
+        return this.name;
     }
 }

@@ -16,6 +16,8 @@ public class Main extends PApplet{
 
     PFont font;
 
+    PJOGL pgl;
+
     private boolean lightingEnabled = false;
 
     private Player player;
@@ -53,7 +55,7 @@ public class Main extends PApplet{
             PVector spawn = world.getRandomSpawnPoint();
             player.setPosition(spawn.x - 0.5f, spawn.y - 1.5f, spawn.z - 0.5f);
         }
-        PJOGL pgl;
+
         if(lightingEnabled) {
             directionalLight(200, 200, 200, 0, -0.75f, 0);
             ambientLight(98, 144, 219);
