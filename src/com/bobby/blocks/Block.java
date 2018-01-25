@@ -1,10 +1,12 @@
 package com.bobby.blocks;
 
 
+import com.bobby.blocks.construction.BlockSingleTexture;
+
 public class Block {
 
     private int lightLevel;
-    BlockSingleTexture texture;
+    public BlockSingleTexture texture;
 
     public Block() {
         this.lightLevel = 15;

@@ -1,6 +1,7 @@
 package com.bobby;
 
 import com.bobby.blocks.*;
+import com.bobby.blocks.construction.BlockGeometry;
 import processing.core.PApplet;
 import processing.core.PShape;
 import processing.core.PVector;

@@ -3,8 +3,24 @@
     <output-path>$PROJECT_DIR$/out/artifacts/AlphaBlock_jar</output-path>
     <root id="archive" name="AlphaBlock.jar">
       <element id="module-output" name="AlphaBlock" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Libraries/core.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Libraries/gluegen-rt.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Libraries/jogl-all.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Libraries/jogl-all-natives-linux-i586.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Libraries/jogl-all-natives-linux-amd64.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Libraries/gluegen-rt-natives-windows-i586.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Libraries/gluegen-rt-natives-macosx-universal.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Libraries/gluegen-rt-natives-windows-amd64.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Libraries/gluegen-rt-natives-linux-amd64.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Libraries/jogl-all-natives-windows-i586.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Libraries/jogl-all-natives-macosx-universal.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Libraries/gluegen-rt-natives-linux-armv6hf.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Libraries/jogl-all-natives-windows-amd64.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Libraries/jogl-all-natives-linux-armv6hf.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Libraries/jogl-all-natives-linux-aarch64.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Libraries/gluegen-rt-natives-linux-aarch64.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/Libraries/gluegen-rt-natives-linux-i586.jar" path-in-jar="/" />
       <element id="dir-copy" path="$PROJECT_DIR$/Data" />
-      <element id="dir-copy" path="$PROJECT_DIR$/Libraries" />
     </root>
   </artifact>
 </component>

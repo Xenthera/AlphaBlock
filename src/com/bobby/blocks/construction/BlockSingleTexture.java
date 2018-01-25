@@ -1,4 +1,4 @@
-package com.bobby.blocks;
+package com.bobby.blocks.construction;
 
 public class BlockSingleTexture {
 

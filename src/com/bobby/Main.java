@@ -27,12 +27,13 @@ public class Main extends PApplet{
     public void setup(){
         PGraphicsOpenGL pg = (PGraphicsOpenGL)g;
         println(PGraphicsOpenGL.OPENGL_VERSION);
+        textureMode(NORMAL);
         background(0);
 
         world = new World(this);
         player = new Player(this, world);
 
-        pg.textureSampling(3);
+        //pg.textureSampling(3);
         gui = createGraphics(width, height);
         surface.setResizable(true);
 
@@ -41,11 +42,8 @@ public class Main extends PApplet{
         textAlign(CENTER, CENTER);
         text("LOADING",width/2,height/2);
 
-
-
-
-
-
+        hint(DISABLE_TEXTURE_MIPMAPS);
+        ((PGraphicsOpenGL)g).textureSampling(3);
     }
 
     public void draw(){
@@ -63,6 +61,8 @@ public class Main extends PApplet{
         pgl = (PJOGL) beginPGL();
         pgl.frontFace(PGL.CCW);
         pgl.enable(PGL.CULL_FACE);
+
+
 
 
 
