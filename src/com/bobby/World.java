@@ -11,6 +11,8 @@ public class World {
 
     PApplet applet;
 
+    public float gravity = 0.25f;
+
     ArrayList<Chunk> chunks;
     //Temporary hard-coded values
     int chunkWidth = 14;

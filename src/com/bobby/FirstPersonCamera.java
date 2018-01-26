@@ -16,7 +16,8 @@ public class FirstPersonCamera {
     private PVector up;
     private PVector right;
     public PVector forward;
-    private PVector velocity;
+    public PVector look;
+    public PVector velocity;
     private PVector center;
     private Point mouse;
     private Point prevMouse;
@@ -27,7 +28,7 @@ public class FirstPersonCamera {
 
     public float tilt, pan;
 
-    private float friction = 0.75f;
+    private float friction = 0.95f;
 
     public boolean isMouseFocused = true;
 
@@ -48,10 +49,11 @@ public class FirstPersonCamera {
         up = new PVector(0f, 1f, 0f);
         right = new PVector(1f, 0f, 0f);
         forward = new PVector(0f, 0f, 1f);
+        look = new PVector(0f, 0.5f, 1f);
         velocity = new PVector(0f, 0f, 0f);
         pan = 0;
         tilt = 0f;
-        speed = 1 / 16f;
+
         app.perspective(PConstants.PI/3f, (float)app.width/(float)app.height, 0.01f, 1000f);
 
     }
@@ -65,8 +67,8 @@ public class FirstPersonCamera {
         robot.mouseMove(w / 2 + x, h / 2 + y);
     }
 
-    public void draw(){
-
+    public void update(){
+        speed = 3.5f * (1.0f / app.frameRate);
         mouse = MouseInfo.getPointerInfo().getLocation();
         if (prevMouse == null) prevMouse = new Point(mouse.x, mouse.y);
         app.cursor();
@@ -90,28 +92,34 @@ public class FirstPersonCamera {
             pan += PApplet.map(deltaX, 0, app.width, 0, PConstants.TWO_PI) * sensitivity;
             tilt += PApplet.map(deltaY, 0, app.height, 0, PConstants.PI) * sensitivity;
         }
-            tilt = clamp(tilt, -PConstants.PI / 2.01f, PConstants.PI / 2.01f);
+        tilt = clamp(tilt, -PConstants.PI / 2.01f, PConstants.PI / 2.01f);
 
 
         if (tilt == PConstants.PI/2) tilt += 0.001f;
 
-        forward = new PVector(PApplet.cos(pan), PApplet.tan(tilt), PApplet.sin(pan));
+        forward = new PVector(PApplet.cos(pan), 0, PApplet.sin(pan));
         forward.normalize();
+        look = new PVector(PApplet.cos(pan), PApplet.tan(tilt), PApplet.sin(pan));
+        look.normalize();
         right = new PVector(PApplet.cos(pan - PConstants.PI/2), 0, PApplet.sin(pan - PConstants.PI/2));
-
+        right.normalize();
         prevMouse = new Point(mouse.x, mouse.y);
 
-        if (keys.containsKey('a') && keys.get('a')) velocity.add(PVector.mult(right, speed));
-        if (keys.containsKey('d') && keys.get('d')) velocity.sub(PVector.mult(right, speed));
-        if (keys.containsKey('w') && keys.get('w')) velocity.add(PVector.mult(forward, speed));
-        if (keys.containsKey('s') && keys.get('s')) velocity.sub(PVector.mult(forward, speed));
-        if (keys.containsKey('q') && keys.get('q')) velocity.add(PVector.mult(up, speed));
-        if (keys.containsKey('e') && keys.get('e')) velocity.sub(PVector.mult(up, speed));
+        if (keys.containsKey('a') && keys.get('a')) position.add(PVector.mult(right, speed));
+        if (keys.containsKey('d') && keys.get('d')) position.sub(PVector.mult(right, speed));
+        if (keys.containsKey('w') && keys.get('w')) position.add(PVector.mult(forward, speed));
+        if (keys.containsKey('s') && keys.get('s')) position.sub(PVector.mult(forward, speed));
+        if (keys.containsKey('q') && keys.get('q')) velocity.add(PVector.mult(up, speed * 0.1f));
+        if (keys.containsKey('e') && keys.get('e')) velocity.sub(PVector.mult(up, speed * 0.1f));
 
-        velocity.mult(friction);
+        //velocity.mult(friction);
         position.add(velocity);
-        center = PVector.add(position, forward);
-        app.camera(position.x, position.y, position.z, center.x, center.y, center.z, up.x, up.y, up.z);
+        center = PVector.add(position, look);
+    }
+
+    public void draw(){
+
+        app.camera(position.x, position.y + 0.5f, position.z, center.x, center.y + 0.5f, center.z, up.x, up.y, up.z);
 
     }
 
@@ -128,7 +136,7 @@ public class FirstPersonCamera {
         keys.put(Character.toLowerCase(key), false);
     }
 
-    private float clamp(float x, float min, float max){
+    public float clamp(float x, float min, float max){
         if (x > max) return max;
         if (x < min) return min;
         return x;

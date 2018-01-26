@@ -9,6 +9,7 @@ import processing.core.PVector;
 public class Player {
     public FirstPersonCamera camera;
     PVector position;
+    PVector velocity;
     public PApplet app;
 
     RayCaster rayCaster;
@@ -24,9 +25,51 @@ public class Player {
     }
 
     public void draw(){
+
         drawFocusedBlock();
+        camera.update();
+        checkCollisions();
         camera.draw();
 
+    }
+
+    public void checkCollisions(){
+        float padding = 0.25f;
+        this.position = this.camera.getPosition();
+        this.camera.velocity.add(new PVector(0, world.gravity * (1.0f / app.frameRate), 0));
+
+        if(world.getBlock((int)position.x, (int)position.y + 2, (int)position.z).isSolid()){
+            this.camera.velocity.y = 0;
+            this.position.y = camera.clamp(this.position.y, this.position.y - 2, ((int)this.position.y + 2) - padding);
+        }
+        if(world.getBlock((int)position.x + 1, (int)position.y, (int)position.z).isSolid() || world.getBlock((int)position.x + 1, (int)position.y + 1, (int)position.z).isSolid()){
+            float penetration = ((int)this.position.x + 1) - this.position.x;
+            if(penetration <= padding) {
+                this.camera.velocity.x = 0;
+                this.position.x = camera.clamp(this.position.x, this.position.x - 1, ((int)this.position.x + 1) - padding);
+            }
+        }
+        if(world.getBlock((int)position.x - 1, (int)position.y, (int)position.z).isSolid() || world.getBlock((int)position.x - 1, (int)position.y + 1, (int)position.z).isSolid()){
+            float penetration = this.position.x - ((int)this.position.x);
+            if(penetration <= padding) {
+                this.camera.velocity.x = 0;
+                this.position.x = camera.clamp(this.position.x, ((int)this.position.x) + padding, this.position.x + 1);
+            }
+        }
+        if(world.getBlock((int)position.x, (int)position.y, (int)position.z + 1).isSolid() || world.getBlock((int)position.x, (int)position.y + 1, (int)position.z + 1).isSolid()){
+            float penetration = ((int)this.position.z + 1) - this.position.z;
+            if(penetration <= padding) {
+                this.camera.velocity.z = 0;
+                this.position.z = camera.clamp(this.position.z, this.position.z - 1, ((int)this.position.z + 1) - padding);
+            }
+        }
+        if(world.getBlock((int)position.x, (int)position.y, (int)position.z - 1).isSolid() || world.getBlock((int)position.x, (int)position.y + 1, (int)position.z - 1).isSolid()){
+            float penetration = this.position.z - ((int)this.position.z);
+            if(penetration <= padding) {
+                this.camera.velocity.z = 0;
+                this.position.z = camera.clamp(this.position.z, ((int)this.position.z) + padding, this.position.z + 1);
+            }
+        }
     }
     public void keyPressed(){
         camera.keyPressed();
@@ -38,7 +81,7 @@ public class Player {
 
 
     public PVector getSightVector(){
-        return camera.forward.normalize();
+        return camera.look;
     }
 
 
