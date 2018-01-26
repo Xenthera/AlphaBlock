@@ -12,6 +12,8 @@ public class Player {
     PVector velocity;
     public PApplet app;
 
+    public boolean onGround = false;
+
     RayCaster rayCaster;
     World world;
 
@@ -34,13 +36,15 @@ public class Player {
     }
 
     public void checkCollisions(){
-        float padding = 0.25f;
+        float padding = 0.3f;
         this.position = this.camera.getPosition();
         this.camera.velocity.add(new PVector(0, world.gravity * (1.0f / app.frameRate), 0));
 
         if(world.getBlock((int)position.x, (int)position.y + 2, (int)position.z).isSolid()){
             this.camera.velocity.y = 0;
+
             this.position.y = camera.clamp(this.position.y, this.position.y - 2, ((int)this.position.y + 2) - padding);
+            this.onGround = true;
         }
         if(world.getBlock((int)position.x + 1, (int)position.y, (int)position.z).isSolid() || world.getBlock((int)position.x + 1, (int)position.y + 1, (int)position.z).isSolid()){
             float penetration = ((int)this.position.x + 1) - this.position.x;
@@ -73,6 +77,10 @@ public class Player {
     }
     public void keyPressed(){
         camera.keyPressed();
+        if(app.key == ' ' && this.onGround){
+            this.camera.velocity.y = -5 * (1.0f / app.frameRate);
+            this.onGround = false;
+        }
     }
 
     public void keyReleased(){
