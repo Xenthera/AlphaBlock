@@ -1,7 +1,6 @@
 package com.bobby;
 
-import com.bobby.blocks.Block;
-import com.bobby.blocks.BlockAir;
+import com.bobby.blocks.*;
 import processing.core.PApplet;
 import processing.core.PVector;
 
@@ -11,7 +10,7 @@ public class World {
 
     PApplet applet;
 
-    public float gravity = 0.25f;
+    public float gravity = 0.35f;
 
     ArrayList<Chunk> chunks;
     //Temporary hard-coded values
@@ -44,11 +43,43 @@ public class World {
     public void load(){
         chunks = new ArrayList<>();
 
-        for (int i = 0; i < chunkWidth; i++) {
-            for (int j = 0; j < chunkLength; j++) {
-                chunks.add(new Chunk(applet, this, i, j));
+        for (int x = 0; x < chunkWidth; x++) {
+            for (int z = 0; z < chunkLength; z++) {
+                Chunk chunk = new Chunk(applet, this, x, z);
+                chunks.add(chunk);
+
             }
         }
+
+        for(Chunk chunk : this.chunks){
+            for (int i = 0; i < chunk.CHUNK_WIDTH; i++) {
+                for (int j = 0; j < chunk.CHUNK_LENGTH; j++) {
+                    int yTop = (int) (applet.noise((chunk.position.x * 16 + i) * 0.02f,
+                            (chunk.position.z * 16 + j) * 0.02f) * 45) + 64;
+                    for (int k = yTop + 1; k < chunk.CHUNK_HEIGHT; k++) {
+                        this.setBlock(new BlockDirt(), i + (int)chunk.position.x * chunk.CHUNK_WIDTH, k, j + (int)chunk.position.z * chunk.CHUNK_LENGTH, false);
+                    }
+
+
+                    if (yTop > 90) {
+                        this.setBlock(new BlockSand(), i + (int)chunk.position.x * chunk.CHUNK_WIDTH, yTop, j + (int)chunk.position.z * chunk.CHUNK_LENGTH, false);
+                    } else {
+                        this.setBlock(new BlockGrass(),i + (int)chunk.position.x * chunk.CHUNK_WIDTH, yTop, j + (int)chunk.position.z * chunk.CHUNK_LENGTH, false);
+                    }
+
+                    if(applet.random(1) > 0.985f &&!(getBlock(i + (int)chunk.position.x * chunk.CHUNK_WIDTH, yTop, j + (int)chunk.position.z * chunk.CHUNK_LENGTH).getName().equals("Sand"))){
+                        chunk.createTree(i, yTop, j);
+                    }
+
+
+                }
+            }
+        }
+
+        int topLayerDepth = 1;
+
+
+
         for (int i = 0; i < chunkWidth; i++) {
             for (int j = 0; j < chunkLength; j++) {
                 chunks.get(i * chunkWidth + j).regenerate();

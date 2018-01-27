@@ -46,7 +46,7 @@ public class Main extends PApplet{
         text("LOADING",width/2,height/2);
 
         hint(DISABLE_TEXTURE_MIPMAPS);
-        ((PGraphicsOpenGL)g).textureSampling(3);
+        ((PGraphicsOpenGL)g).textureSampling(2);
     }
 
     public void draw(){

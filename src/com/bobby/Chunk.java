@@ -1,6 +1,9 @@
 package com.bobby;
 
-import com.bobby.blocks.*;
+import com.bobby.blocks.Block;
+import com.bobby.blocks.BlockAir;
+import com.bobby.blocks.BlockOak;
+import com.bobby.blocks.BlockOakLeaves;
 import com.bobby.blocks.construction.BlockGeometry;
 import processing.core.PApplet;
 import processing.core.PShape;
@@ -60,45 +63,40 @@ public class Chunk {
         }
 
         //TEMPORARY: Generate full chunk
-        int topLayerDepth = 1;
 
-        for (int i = 0; i < CHUNK_WIDTH; i++) {
-            for (int j = 0; j < CHUNK_LENGTH; j++) {
-                int yTop = (int) (applet.noise((this.position.x * 16 + i) * 0.02f,
-                        (this.position.z * 16 + j) * 0.02f) * 45) + 64;
-                for (int k = yTop + 1; k < CHUNK_HEIGHT; k++) {
-                    setBlock(new BlockDirt(), i, k, j, false);
-                }
-                for (int k = 0; k < topLayerDepth; k++) {
-
-                    if (yTop > 100) {
-                        setBlock(new BlockSand(), i, yTop + k, j, false);
-                    } else {
-                        setBlock(new BlockGrass(), i, yTop + k, j, false);
-                    }
-
-                    if(applet.random(1) > 0.975f && !(getBlock(i, yTop, j).getName().equals("Sand"))){
-                        createTree(i, yTop, j);
-                    }
-
-                }
-            }
-        }
     }
 
-    private void createTree(int x, int y, int z){
-        int height = (int)applet.random(4,8);
+    public void createTree(int x, int y, int z){
+        PVector treePos = toWorldSpace(x,y,z);
+        x = (int)treePos.x;
+        z = (int)treePos.z;
+        int height;
+        float type = applet.random(1f);
+        if(type < 0.5f) {
+            height = (int) applet.random(4, 8);
+        }else{
+            height = (int) applet.random(20, 60);
+        }
         for (int k = 0; k < height; k++) {
             if(k < height / 2){
-                for (int treeWidth = (k == height / 2 - 1 ? -2 : -1); treeWidth <= (k == height / 2 - 1 ? 2 : 1); treeWidth++) {
-                    for (int treeLength = (k == height / 2 - 1 ? -2 : -1); treeLength <= (k == height / 2 - 1 ? 2 : 1); treeLength++) {
-                        setBlock(new BlockOakLeaves(), x + treeWidth, y - height + k, z + treeLength, false);
+                if(type >= 0.5f && k % 2 == 0) {
+                    for (int treeWidth = (k == height / 2 - 1 ? -2 : -1); treeWidth <= (k == height / 2 - 1 ? 2 : 1); treeWidth++) {
+                        for (int treeLength = (k == height / 2 - 1 ? -2 : -1); treeLength <= (k == height / 2 - 1 ? 2 : 1); treeLength++) {
+                            if(applet.random(1) < 0.8f)
+                                world.setBlock(new BlockOakLeaves(), x + treeWidth, y - height + k, z + treeLength, false);
+                        }
+                    }
+                } else {
+                    for (int treeWidth = (k == height / 2 - 1 ? -2 : -1); treeWidth <= (k == height / 2 - 1 ? 2 : 1); treeWidth++) {
+                        for (int treeLength = (k == height / 2 - 1 ? -2 : -1); treeLength <= (k == height / 2 - 1 ? 2 : 1); treeLength++) {
+                            world.setBlock(new BlockOakLeaves(), x + treeWidth, y - height + k, z + treeLength, false);
+                        }
                     }
                 }
             }
-            setBlock(new BlockOak(), x, y - height + k, z, false);
+            world.setBlock(new BlockOak(), x, y - height + k, z, false);
         }
-        setBlock(new BlockOakLeaves(), x, y - height - 1, z, false);
+        world.setBlock(new BlockOakLeaves(), x, y - height - 1, z, false);
 
     }
 
@@ -144,7 +142,6 @@ public class Chunk {
             if (x == cwidth - 1) {
                 if (world.getBlock((int) worldSpace.x + 1, y, (int) worldSpace.z).isSolid()) {
                     world.getChunk((int)this.position.x + 1, (int)this.position.z).subChunkDirtyList[chunkLocation] = true;
-                    applet.println("X positive edge");
                 }
             }
             if (z == 0) {

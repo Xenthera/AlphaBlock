@@ -6,11 +6,17 @@ import com.bobby.blocks.BlockStoneBrick;
 import processing.core.PApplet;
 import processing.core.PVector;
 
+import java.util.HashMap;
+
 public class Player {
-    public FirstPersonCamera camera;
+    FirstPersonCamera camera;
     PVector position;
     PVector velocity;
-    public PApplet app;
+    private PApplet app;
+    HashMap<Character, Boolean> keys;
+    private float friction = 0.75f;
+
+    float speed;
 
     public boolean onGround = false;
 
@@ -19,91 +25,123 @@ public class Player {
 
     public Player(PApplet app, World world) {
         this.world = world;
-        this.camera = new FirstPersonCamera(app);
-        this.position = this.camera.getPosition();
+        this.camera = new FirstPersonCamera(app, this);
+        this.position = new PVector(0, 0, 0);
         this.app = app;
         rayCaster = new RayCaster(this.app, this.world);
+        this.keys = new HashMap<>();
+        velocity = new PVector(0f, 0f, 0f);
+    }
+
+    public void draw() {
+        this.drawFocusedBlock();
+
+        this.update();
+
+        this.camera.draw();
 
     }
 
-    public void draw(){
+    public void update() {
 
-        drawFocusedBlock();
-        camera.update();
-        checkCollisions();
-        camera.draw();
+        speed = 1.5f * (1.0f / app.frameRate);
+        if (keys.containsKey('a') && keys.get('a')) velocity.add(PVector.mult(camera.right, speed));
+        if (keys.containsKey('d') && keys.get('d')) velocity.sub(PVector.mult(camera.right, speed));
+        if (keys.containsKey('w') && keys.get('w')) velocity.add(PVector.mult(camera.forward, speed));
+        if (keys.containsKey('s') && keys.get('s')) velocity.sub(PVector.mult(camera.forward, speed));
+        if (keys.containsKey('q') && keys.get('q')) velocity.add(PVector.mult(camera.up, speed * 0.1f));
+        if (keys.containsKey('e') && keys.get('e')) velocity.sub(PVector.mult(camera.up, speed * 0.1f));
+        velocity.x *= friction;
+        velocity.z *= friction;
+        position = this.checkCollisions(this.position.add(this.velocity));
 
+        this.camera.update();
     }
 
-    public void checkCollisions(){
-        float padding = 0.3f;
-        this.position = this.camera.getPosition();
-        this.camera.velocity.add(new PVector(0, world.gravity * (1.0f / app.frameRate), 0));
+    public float clamp(float x, float min, float max) {
+        if (x > max) return max;
+        if (x < min) return min;
+        return x;
+    }
 
-        if(world.getBlock((int)position.x, (int)position.y + 2, (int)position.z).isSolid()){
-            this.camera.velocity.y = 0;
+    public PVector checkCollisions(PVector position) {
+        PVector newPosition = position;
+        float paddingP = 0.75f;
+        float paddingN = 1 - paddingP;
+        this.velocity.add(new PVector(0, world.gravity * (1.0f / app.frameRate), 0));
 
-            this.position.y = camera.clamp(this.position.y, this.position.y - 2, ((int)this.position.y + 2) - padding);
+        if (world.getBlock((int) position.x, (int) (position.y + 1.5f), (int) position.z).isSolid()) {
+            this.velocity.y = 0;
+
+            this.position.y = (int) this.position.y + 0.5f;
             this.onGround = true;
         }
-        if(world.getBlock((int)position.x + 1, (int)position.y, (int)position.z).isSolid() || world.getBlock((int)position.x + 1, (int)position.y + 1, (int)position.z).isSolid()){
-            float penetration = ((int)this.position.x + 1) - this.position.x;
-            if(penetration <= padding) {
-                this.camera.velocity.x = 0;
-                this.position.x = camera.clamp(this.position.x, this.position.x - 1, ((int)this.position.x + 1) - padding);
+        if (world.getBlock((int) position.x, (int) (position.y - 1), (int) position.z).isSolid()) {
+            float penetration = (int) this.position.y - this.position.y;
+            if (-penetration < paddingN) {
+                this.velocity.y = 0;
+                newPosition.y += (paddingN + penetration);
             }
         }
-        if(world.getBlock((int)position.x - 1, (int)position.y, (int)position.z).isSolid() || world.getBlock((int)position.x - 1, (int)position.y + 1, (int)position.z).isSolid()){
-            float penetration = this.position.x - ((int)this.position.x);
-            if(penetration <= padding) {
-                this.camera.velocity.x = 0;
-                this.position.x = camera.clamp(this.position.x, ((int)this.position.x) + padding, this.position.x + 1);
+        if (world.getBlock((int) position.x + 1, (int) position.y, (int) position.z).isSolid() || world.getBlock((int) position.x + 1, (int) position.y + 1, (int) position.z).isSolid()) {
+            float penetration = (this.position.x - (int) this.position.x) * 1;
+            if (!(penetration < paddingP)) {
+                newPosition.x -= (penetration - paddingP) * 1;
             }
         }
-        if(world.getBlock((int)position.x, (int)position.y, (int)position.z + 1).isSolid() || world.getBlock((int)position.x, (int)position.y + 1, (int)position.z + 1).isSolid()){
-            float penetration = ((int)this.position.z + 1) - this.position.z;
-            if(penetration <= padding) {
-                this.camera.velocity.z = 0;
-                this.position.z = camera.clamp(this.position.z, this.position.z - 1, ((int)this.position.z + 1) - padding);
+
+        if (world.getBlock((int) position.x - 1, (int) position.y, (int) position.z).isSolid() || world.getBlock((int) position.x - 1, (int) position.y + 1, (int) position.z).isSolid()) {
+            //float penetration = (this.position.x - (int)this.position.x - 1) * 1;
+            float penetration = (int) this.position.x - this.position.x;
+            if (-penetration < paddingN) {
+                newPosition.x += (paddingN + penetration);
             }
         }
-        if(world.getBlock((int)position.x, (int)position.y, (int)position.z - 1).isSolid() || world.getBlock((int)position.x, (int)position.y + 1, (int)position.z - 1).isSolid()){
-            float penetration = this.position.z - ((int)this.position.z);
-            if(penetration <= padding) {
-                this.camera.velocity.z = 0;
-                this.position.z = camera.clamp(this.position.z, ((int)this.position.z) + padding, this.position.z + 1);
+
+        if (world.getBlock((int) position.x, (int) position.y, (int) position.z + 1).isSolid() || world.getBlock((int) position.x, (int) position.y + 1, (int) position.z + 1).isSolid()) {
+            float penetration = (this.position.z - (int) this.position.z) * 1;
+            if (!(penetration < paddingP)) {
+                newPosition.z -= (penetration - paddingP) * 1;
             }
         }
+        if (world.getBlock((int) position.x, (int) position.y, (int) position.z - 1).isSolid() || world.getBlock((int) position.x, (int) position.y + 1, (int) position.z - 1).isSolid()) {
+            //float penetration = (this.position.x - (int)this.position.x - 1) * 1;
+            float penetration = (int) this.position.z - this.position.z;
+            if (-penetration < paddingN) {
+                newPosition.z += (paddingN + penetration);
+            }
+        }
+        return newPosition;
     }
-    public void keyPressed(){
-        camera.keyPressed();
-        if(app.key == ' ' && this.onGround){
-            this.camera.velocity.y = -5 * (1.0f / app.frameRate);
-            this.onGround = false;
+
+    public void keyPressed() {
+        char key = app.key;
+        keys.put(Character.toLowerCase(key), true);
+
+        if (app.key == ' ' && onGround) {
+            this.velocity.y += -7 * (1.0f / app.frameRate);
+            onGround = false;
         }
     }
 
-    public void keyReleased(){
-        camera.keyReleased();
+    public void keyReleased() {
+        char key = app.key;
+        keys.put(Character.toLowerCase(key), false);
     }
 
-
-    public PVector getSightVector(){
+    public PVector getSightVector() {
         return camera.look;
     }
 
 
-
-
-
-    private void drawFocusedBlock(){
+    private void drawFocusedBlock() {
         PVector vector = getSightVector();
         Ray ray = rayCaster.traceRay(this.position, vector, 80);
         PVector position = ray.getHitPostition();
-        if(ray.hasTarget()){
+        if (ray.hasTarget()) {
             app.pushStyle();
-            app.fill(0,0,255,50);
-            app.translate(0.5f + position.x,0.5f + position.y,0.5f + position.z);
+            app.fill(0, 0, 255, 50);
+            app.translate(0.5f + position.x, 0.5f + position.y, 0.5f + position.z);
             app.box(1.01f);
             app.popStyle();
         }
@@ -111,7 +149,7 @@ public class Player {
 
     }
 
-    public void setPosition(float x, float y, float z){
+    public void setPosition(float x, float y, float z) {
         this.position.x = x;
         this.position.y = y;
         this.position.z = z;
@@ -119,24 +157,32 @@ public class Player {
     }
 
 
-    public void mousePressed(){
+    public void mousePressed() {
 
 
         PVector vector = getSightVector();
         Ray ray = rayCaster.traceRay(this.position, vector, 80);
         PVector position = ray.getHitPostition();
+
+        PVector nPlayerPosition = new PVector((int) this.position.x, (int) this.position.y, (int) this.position.z);
+        PVector nPlayerPositionPlusOne = new PVector((int) this.position.x, (int) this.position.y + 1, (int) this.position.z);
         PVector normal = ray.getHitNormal();
+        PVector nPosition = new PVector((int) ray.getHitPostition().x, (int) ray.getHitPostition().y, (int) ray.getHitPostition().z);
+        nPosition.add(normal);
         if (camera.isMouseFocused) {
             if (ray.hasTarget()) {
+
                 if (app.mouseButton == app.LEFT) {
                     world.removeBlock((int) position.x, (int) position.y, (int) position.z, true);
                 } else if (app.mouseButton == app.RIGHT) {
-                    world.setBlock(new BlockStoneBrick(), (int)position.x + (int)normal.x, (int) position.y + (int)normal.y, (int) position.z + (int)normal.z, true);
+                    if (!nPlayerPosition.equals(nPosition) && !nPlayerPositionPlusOne.equals(nPosition)) {
+                        world.setBlock(new BlockStoneBrick(), (int) position.x + (int) normal.x, (int) position.y + (int) normal.y, (int) position.z + (int) normal.z, true);
+                    }
                 }
             }
         }
 
-        if(camera.isMouseFocused == false){
+        if (camera.isMouseFocused == false) {
             camera.centerMouse();
             camera.isMouseFocused = true;
         }
