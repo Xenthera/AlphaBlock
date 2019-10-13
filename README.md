@@ -6,7 +6,9 @@ Update (10/12/19)
 ---
 + Fog
 + Leaves Transparency
-+ Lighting framework
++ Lighting
+
+![](https://i.imgur.com/2nbvPHX.png)
 
 ![](https://i.imgur.com/WZdpSQ7.png)
 
