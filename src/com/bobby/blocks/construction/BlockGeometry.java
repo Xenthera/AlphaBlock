@@ -2,6 +2,7 @@ package com.bobby.blocks.construction;
 
 import com.bobby.TextureManager;
 import com.bobby.blocks.Block;
+import processing.core.PApplet;
 import processing.core.PShape;
 import processing.core.PVector;
 
@@ -36,30 +37,65 @@ public class BlockGeometry {
             4, 5, 6,
             4, 6, 7};
 
-    public static void constructBlock(TextureManager manager, Block block, PShape shape, boolean negativeX, boolean positiveX, boolean negativeY, boolean positiveY, boolean negativeZ, boolean positiveZ, int x, int y, int z) {
+    public static void constructBlock(PApplet applet, TextureManager manager, Block block, PShape shape, boolean negativeX, boolean positiveX, boolean negativeY, boolean positiveY, boolean negativeZ, boolean positiveZ, int x, int y, int z) {
+        if(block.getName() != "Leaves") {
+            int blockLight = (int) applet.map(applet.log(15 - block.getLightLevel()), 0, 3, 25, 255);
+            blockLight = applet.max(blockLight, 25);
+            blockLight = 255 - blockLight;
+            shape.tint(applet.max(blockLight - 35, 0));
+            if (negativeX)
+                //shape.fill(255, 0, 0, 255);
+                constructLeft(manager, block, shape, x, y, z);
+            shape.tint(applet.max(blockLight - 35, 0));
+            if (positiveX)
+                //shape.fill(255, 255, 0, 255);
+                constructRight(manager, block, shape, x, y, z);
 
-        shape.tint(150);
-        if (negativeX)
-            //shape.fill(255, 0, 0, 255);
-            constructLeft(manager, block, shape, x, y, z);
-        shape.tint(150);
-        if (positiveX)
-            //shape.fill(255, 255, 0, 255);
-            constructRight(manager, block, shape, x, y, z);
-        shape.tint(255);
-        if (negativeY)
-            //shape.fill(255, 0, 255, 255);
-            constructTop(manager, block, shape, x, y, z);
-        shape.tint(100);
-        if (positiveY)
-            //shape.fill(255, 255, 255, 255);
-            constructBottom(manager, block, shape, x, y, z);
-        shape.tint(150);
-        if (negativeZ)
-            constructBack(manager, block, shape, x, y, z);
-        shape.tint(150);
-        if (positiveZ)
-            constructFront(manager, block, shape, x, y, z);
+            if(block.getName() == "Grass"){
+                shape.tint(blockLight * .4f, blockLight * .8f, blockLight * .2f);
+            }else {
+                shape.tint(blockLight, 0);
+            }
+            if (negativeY)
+                //shape.fill(255, 0, 255, 255);
+                constructTop(manager, block, shape, x, y, z);
+            shape.tint(applet.max(blockLight - 75, 0));
+            if (positiveY)
+                //shape.fill(255, 255, 255, 255);
+                constructBottom(manager, block, shape, x, y, z);
+            shape.tint(applet.max(blockLight - 35, 0));
+            if (negativeZ)
+                constructBack(manager, block, shape, x, y, z);
+            shape.tint(applet.max(blockLight - 35, 0));
+            if (positiveZ)
+                constructFront(manager, block, shape, x, y, z);
+        }else{
+            int blockLight = (int) applet.map(applet.log(15 - block.getLightLevel()), 0, 3, 25, 255);
+            blockLight = applet.max(blockLight, 25);
+            blockLight = 255 - blockLight;
+            shape.tint(0, applet.max(blockLight - 35, 0) * .8f, 0);
+            if (negativeX)
+                //shape.fill(255, 0, 0, 255);
+                constructLeft(manager, block, shape, x, y, z);
+            shape.tint(0, applet.max(blockLight - 35, 0) * .8f, 0);
+            if (positiveX)
+                //shape.fill(255, 255, 0, 255);
+                constructRight(manager, block, shape, x, y, z);
+            shape.tint(0, blockLight * .8f, 0);
+            if (negativeY)
+                //shape.fill(255, 0, 255, 255);
+                constructTop(manager, block, shape, x, y, z);
+            shape.tint(0, applet.max(blockLight - 75, 0) * .8f, 0);
+            if (positiveY)
+                //shape.fill(255, 255, 255, 255);
+                constructBottom(manager, block, shape, x, y, z);
+            shape.tint(0, applet.max(blockLight - 35, 0) * .8f, 0);
+            if (negativeZ)
+                constructBack(manager, block, shape, x, y, z);
+            shape.tint(0, applet.max(blockLight - 35, 0) * .8f, 0);
+            if (positiveZ)
+                constructFront(manager, block, shape, x, y, z);
+        }
     }
 
     private static void constructBack(TextureManager manager, Block block, PShape shape, int  x, int y, int z) {

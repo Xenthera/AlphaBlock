@@ -18,6 +18,7 @@
       <root url="jar://$PROJECT_DIR$/Libraries/jogl-all-natives-linux-aarch64.jar!/" />
       <root url="jar://$PROJECT_DIR$/Libraries/gluegen-rt-natives-linux-aarch64.jar!/" />
       <root url="jar://$PROJECT_DIR$/Libraries/gluegen-rt-natives-linux-i586.jar!/" />
+      <root url="jar://$PROJECT_DIR$/Libraries/vecmath-1.5.1.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

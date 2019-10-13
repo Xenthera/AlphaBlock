@@ -11,7 +11,7 @@ public class TextureManager {
     private int imageSize, individualTextureSize;
 
     public TextureManager(PApplet applet) {
-        textureAtlas = applet.loadImage("terrain.png");
+        textureAtlas = applet.loadImage("terrain2.png");
         imageSize = textureAtlas.width;
         individualTextureSize = imageSize/16;
     }

@@ -4,6 +4,7 @@ public class BlockAir extends Block {
 
     public BlockAir() {
         super();
+        this.name = "Air";
     }
 
     public boolean isSolid() {

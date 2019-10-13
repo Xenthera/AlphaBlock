@@ -1,9 +1,11 @@
 package com.bobby;
 
-import processing.core.PApplet;
-import processing.core.PFont;
-import processing.core.PGraphics;
-import processing.core.PVector;
+import com.bobby.blocks.Block;
+import com.bobby.blocks.BlockGrass;
+import com.bobby.blocks.BlockOakLeaves;
+import com.bobby.blocks.BlockSandstone;
+import com.bobby.blocks.construction.BlockGeometry;
+import processing.core.*;
 import processing.opengl.PGL;
 import processing.opengl.PGraphicsOpenGL;
 import processing.opengl.PJOGL;
@@ -18,9 +20,13 @@ public class Main extends PApplet{
 
     PJOGL pgl;
 
-    PShader blockShader;
+    PShader blockShader, blockShaderUnlit;
 
-    private boolean lightingEnabled = false;
+    PShape loadingMesh;
+
+
+
+    private boolean lightingEnabled = true;
 
     private Player player;
 
@@ -50,12 +56,19 @@ public class Main extends PApplet{
 
         blockShader = loadShader("com/bobby/Frag.glsl", "com/bobby/Vert.glsl");
 
-        blockShader.set("fraction", 1.0f);
+        blockShaderUnlit = loadShader("com/bobby/FragUnlit.glsl", "com/bobby/VertUnlit.glsl");
 
         if(!world.isLoaded){
             thread("loadWorldThread");
         }
-
+        Block loadingBlock = new BlockGrass();
+        loadingBlock.setLightLevel(15);
+        loadingMesh = createShape();
+        loadingMesh.beginShape(PConstants.TRIANGLE);
+        loadingMesh.texture(world.textureManager.getTextureAtlas());
+        BlockGeometry.constructBlock(this, world.textureManager, loadingBlock, loadingMesh, true, true, true, true, true, true, 0, 0, 0);
+        loadingMesh.noStroke();
+        loadingMesh.endShape();
     }
 
     public void loadWorldThread(){
@@ -65,20 +78,38 @@ public class Main extends PApplet{
         player.setPosition(spawn.x - 0.5f, spawn.y - 1.5f, spawn.z - 0.5f);
     }
 
+    void loadingDraw(){
+        background(0);
+        pushMatrix();
+        resetMatrix();
+        translate(0, -2.4f, 0);
+        perspective(radians(50), (float)width/(float)height, 0.1f, 1000);
+        //translate(-0.5f, 0, -0.5f);
+        noFill();
+        stroke(255);
+
+        translate(0, 0, -7);
+        rotate(millis() * 0.001f, 0, 1, 0);
+        translate(-0.5f, 0, -0.5f);
+        shape(this.loadingMesh);
+        popMatrix();
+
+        textAlign(CENTER, BOTTOM);
+        //text("Loading World", width / 2, height / 2);
+        fill(0,100,255);
+        text("Loading:\n" + this.world.progressType, width / 2, height / 2);
+        noStroke();
+        rect(width / 3, height / 2 + 40, world.progress * (width / 3), 50);
+        noFill();
+        stroke(255);
+        strokeWeight(6);
+        rect(width / 3 - 10, height / 2 + 30, (width / 3) + 20, 70, 0);
+    }
+
     public void draw(){
 
         if(world.isLoading){
-            background(0);
-            textAlign(CENTER, BOTTOM);
-            //text("Loading World", width / 2, height / 2);
-            text("Loading:\n" + this.world.progressType, width / 2, height / 2);
-            noFill();
-            stroke(255);
-            strokeWeight(6);
-            rect(width / 3 - 10, height / 2 + 30, (width / 3) + 20, 70, 0);
-            fill(0,100,255);
-            noStroke();
-            rect(width / 3, height / 2 + 40, world.progress * (width / 3), 50);
+            loadingDraw();
             return;
         }
 
@@ -92,7 +123,7 @@ public class Main extends PApplet{
 
 
 
-        shader(blockShader);
+        shader(lightingEnabled ? blockShader : blockShaderUnlit);
         world.draw();
         resetShader();
 

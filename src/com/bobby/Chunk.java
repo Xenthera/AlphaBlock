@@ -23,7 +23,7 @@ public class Chunk {
 
     private World world;
 
-    public final int CHUNK_WIDTH = 16, CHUNK_LENGTH = 16, CHUNK_HEIGHT = 128;
+    public final int CHUNK_WIDTH = 16, CHUNK_LENGTH = 16, CHUNK_HEIGHT = 256;
     private final int cwidth = 16, clength = 16, cheight = 16;
     private final int chunkStackHeight = CHUNK_HEIGHT / cheight; // 16 * 8 = 128;
 
@@ -39,7 +39,7 @@ public class Chunk {
 
         this.applet = applet;
 
-        textureManager = new TextureManager(this.applet);
+        textureManager = world.textureManager;
 
         subChunks = new ArrayList();
         meshes = new PShape[chunkStackHeight];
@@ -66,39 +66,7 @@ public class Chunk {
 
     }
 
-    public void createTree(int x, int y, int z){
-        PVector treePos = toWorldSpace(x,y,z);
-        x = (int)treePos.x;
-        z = (int)treePos.z;
-        int height;
-        float type = applet.random(1f);
-        if(type < 0.9f) {
-            height = (int) applet.random(4, 8);
-        }else{
-            height = (int) applet.random(20, 60);
-        }
-        for (int k = 0; k < height; k++) {
-            if(k < height / 2){
-                if(type >= 0.5f && k % 2 == 0) {
-                    for (int treeWidth = (k == height / 2 - 1 ? -2 : -1); treeWidth <= (k == height / 2 - 1 ? 2 : 1); treeWidth++) {
-                        for (int treeLength = (k == height / 2 - 1 ? -2 : -1); treeLength <= (k == height / 2 - 1 ? 2 : 1); treeLength++) {
-                            if(applet.random(1) < 0.8f)
-                                world.setBlock(new BlockOakLeaves(), x + treeWidth, y - height + k, z + treeLength, false);
-                        }
-                    }
-                } else {
-                    for (int treeWidth = (k == height / 2 - 1 ? -2 : -1); treeWidth <= (k == height / 2 - 1 ? 2 : 1); treeWidth++) {
-                        for (int treeLength = (k == height / 2 - 1 ? -2 : -1); treeLength <= (k == height / 2 - 1 ? 2 : 1); treeLength++) {
-                            world.setBlock(new BlockOakLeaves(), x + treeWidth, y - height + k, z + treeLength, false);
-                        }
-                    }
-                }
-            }
-            world.setBlock(new BlockOak(), x, y - height + k, z, false);
-        }
-        world.setBlock(new BlockOakLeaves(), x, y - height - 1, z, false);
 
-    }
 
     public Block getBlock(int x, int y, int z) {
         int chunkLocation = y / cwidth;
@@ -113,7 +81,7 @@ public class Chunk {
         int chunkLocation = y / cwidth;
         int blockLocation = y % cwidth;
 
-        if(x < 0 || y < 0 || z < 0 || x > cwidth - 1 || y > 128 - 1 || z > clength - 1){
+        if(x < 0 || y < 0 || z < 0 || x > cwidth - 1 || y > 256 - 1 || z > clength - 1){
             return;
         }
 
@@ -214,7 +182,7 @@ public class Chunk {
                                     py = false;
                                 }
 
-                                BlockGeometry.constructBlock(textureManager, world.getBlock(worldX, y, worldZ), meshes[i], nx, px, ny, py, nz, pz, x, y, z);
+                                BlockGeometry.constructBlock(applet, textureManager, world.getBlock(worldX, y, worldZ), meshes[i], nx, px, ny, py, nz, pz, x, y, z);
 
                             //meshes[i].tint(this.applet.map(world.getBlock(x, y, z).getLightLevel(), 0, 15, 50, 255));
 

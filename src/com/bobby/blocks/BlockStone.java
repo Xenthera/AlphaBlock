@@ -6,6 +6,7 @@ public class BlockStone extends Block {
 
     public BlockStone() {
         super();
+        this.name = "Stone";
         texture = new BlockSingleTexture(1,0);
     }
 }

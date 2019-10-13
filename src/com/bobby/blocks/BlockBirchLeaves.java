@@ -2,11 +2,11 @@ package com.bobby.blocks;
 
 import com.bobby.blocks.texture.BlockSingleTexture;
 
-public class BlockOakLeaves extends Block{
+public class BlockBirchLeaves extends Block{
 
-    public BlockOakLeaves(){
+    public BlockBirchLeaves(){
         this.name = "Leaves";
-        this.texture = new BlockSingleTexture(4,8);
+        this.texture = new BlockSingleTexture(4,12);
     }
 
     public boolean isOpaque() {

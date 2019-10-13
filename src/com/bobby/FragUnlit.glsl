@@ -17,7 +17,6 @@ varying vec3 vertLightDir;
 
 in float frag_distance;
 
-in vec4 vertex_color;
 void main() {
 
     vec4 fragColor = texture2D(texture, vertTexCoord.st);
@@ -29,5 +28,5 @@ void main() {
     }
 
 
-    gl_FragColor = vec4(mix(fragColor.xyz * vertex_color.xyz, sky_color, min(1.0f, frag_distance / 30000)), fragColor.w);
+    gl_FragColor = vec4(mix(fragColor.xyz, sky_color, min(1.0f, frag_distance / 30000)), fragColor.w);
 }
