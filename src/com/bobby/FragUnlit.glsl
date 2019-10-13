@@ -28,5 +28,5 @@ void main() {
     }
 
 
-    gl_FragColor = vec4(mix(fragColor.xyz, sky_color, min(1.0f, frag_distance / 30000)), fragColor.w);
+    gl_FragColor = fragColor;
 }
