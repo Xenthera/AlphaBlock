@@ -5,7 +5,7 @@ import com.bobby.blocks.texture.BlockSingleTexture;
 public class BlockOakLeaves extends Block{
 
     public BlockOakLeaves(){
-        this.texture = new BlockSingleTexture(4,3);
+        this.texture = new BlockSingleTexture(4,12);
     }
 
     public boolean isOpaque() {

@@ -14,16 +14,17 @@ public class World {
 
     ArrayList<Chunk> chunks;
     //Temporary hard-coded values
-    int chunkWidth = 14;
-    int chunkLength = 14;
+    int chunkWidth = 16;
+    int chunkLength = 16;
     boolean isLoaded = false;
+    boolean isLoading = false;
+
+    float progress = 0;
+    String progressType = "";
 
 
     public World(PApplet applet){
         this.applet = applet;
-
-
-
     }
 
     public PVector getRandomSpawnPoint(){
@@ -41,21 +42,30 @@ public class World {
     }
 
     public void load(){
+        this.isLoading = true;
         chunks = new ArrayList<>();
 
+        float chunkCount = 0;
+        this.progressType = "Creating chunks";
         for (int x = 0; x < chunkWidth; x++) {
             for (int z = 0; z < chunkLength; z++) {
                 Chunk chunk = new Chunk(applet, this, x, z);
                 chunks.add(chunk);
-
+                chunkCount++;
+                this.progress = chunkCount / (chunkWidth * chunkLength);
             }
         }
-
+        chunkCount = 0;
+        this.progressType = "Generating terrain";
         for(Chunk chunk : this.chunks){
+
+            chunkCount++;
+            this.progress = chunkCount / (chunkWidth * chunkLength);
+
             for (int i = 0; i < chunk.CHUNK_WIDTH; i++) {
                 for (int j = 0; j < chunk.CHUNK_LENGTH; j++) {
                     int yTop = (int) (applet.noise((chunk.position.x * 16 + i) * 0.02f,
-                            (chunk.position.z * 16 + j) * 0.02f) * 45) + 64;
+                            (chunk.position.z * 16 + j) * 0.02f) * 45) + 70;
                     for (int k = yTop + 1; k < chunk.CHUNK_HEIGHT; k++) {
                         this.setBlock(new BlockDirt(), i + (int)chunk.position.x * chunk.CHUNK_WIDTH, k, j + (int)chunk.position.z * chunk.CHUNK_LENGTH, false);
                     }
@@ -78,15 +88,18 @@ public class World {
 
         int topLayerDepth = 1;
 
-
-
+        chunkCount = 0;
+        this.progressType = "Constructing chunks";
         for (int i = 0; i < chunkWidth; i++) {
             for (int j = 0; j < chunkLength; j++) {
                 chunks.get(i * chunkWidth + j).regenerate();
+                chunkCount++;
+                this.progress = chunkCount / (chunkWidth * chunkLength);
             }
         }
 
         this.isLoaded = true;
+        this.isLoading = false;
     }
 
     public void draw(){

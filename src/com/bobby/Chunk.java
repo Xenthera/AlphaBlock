@@ -72,7 +72,7 @@ public class Chunk {
         z = (int)treePos.z;
         int height;
         float type = applet.random(1f);
-        if(type < 0.5f) {
+        if(type < 0.9f) {
             height = (int) applet.random(4, 8);
         }else{
             height = (int) applet.random(20, 60);
@@ -169,7 +169,6 @@ public class Chunk {
         boolean faceDefault = true;
         for (int i = 0; i < chunkStackHeight; i++) {
             if (subChunkDirtyList[i] == true) { // If the chunk is dirty?
-                meshes[i] = null;
                 meshes[i] = this.applet.createShape();
                 meshes[i].beginShape(this.applet.TRIANGLE);
                 meshes[i].texture(textureManager.getTextureAtlas());
@@ -188,27 +187,27 @@ public class Chunk {
 
                                 boolean nx = faceDefault;
                                 if (worldX > 0) {
-                                    nx = !world.getBlock(worldX - 1, y, worldZ).isSolid();
+                                    nx = !world.getBlock(worldX - 1, y, worldZ).isSolid() || !world.getBlock(worldX - 1, y, worldZ).isOpaque();
                                 }
                                 boolean px = faceDefault;
                                 if (worldX < world.chunkWidth * CHUNK_WIDTH - 1) {
-                                    px = !world.getBlock(worldX + 1, y, worldZ).isSolid();
+                                    px = !world.getBlock(worldX + 1, y, worldZ).isSolid() || !world.getBlock(worldX + 1, y, worldZ).isOpaque();
                                 }
                                 boolean ny = faceDefault;
                                 if (y > 0) {
-                                    ny = !world.getBlock(worldX, y - 1, worldZ).isSolid();
+                                    ny = !world.getBlock(worldX, y - 1, worldZ).isSolid() || !world.getBlock(worldX, y - 1, worldZ).isOpaque();
                                 }
                                 boolean py = faceDefault;
                                 if (y < CHUNK_HEIGHT - 1) {
-                                    py = !world.getBlock(worldX, y + 1, worldZ).isSolid();
+                                    py = !world.getBlock(worldX, y + 1, worldZ).isSolid() || !world.getBlock(worldX, y + 1, worldZ).isOpaque();
                                 }
                                 boolean nz = faceDefault;
                                 if (worldZ > 0) {
-                                    nz = !world.getBlock(worldX, y, worldZ - 1).isSolid();
+                                    nz = !world.getBlock(worldX, y, worldZ - 1).isSolid() || !world.getBlock(worldX, y, worldZ - 1).isOpaque();
                                 }
                                 boolean pz = faceDefault;
                                 if (worldZ < world.chunkLength * CHUNK_LENGTH - 1) {
-                                    pz = !world.getBlock(worldX, y, worldZ + 1).isSolid();
+                                    pz = !world.getBlock(worldX, y, worldZ + 1).isSolid() || !world.getBlock(worldX, y, worldZ + 1).isOpaque();
                                 }
 
                                 if (y == CHUNK_HEIGHT - 1) {
@@ -224,6 +223,10 @@ public class Chunk {
                 }
             }
             meshes[i].endShape();
+            for (int j = 0; j < meshes[i].getVertexCount(); j++) {
+                meshes[i].setFill(j, 0xff0000);
+            }
+
             subChunkDirtyList[i] = false; // All clean!
         }
     }

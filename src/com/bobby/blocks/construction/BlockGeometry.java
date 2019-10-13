@@ -37,16 +37,27 @@ public class BlockGeometry {
             4, 6, 7};
 
     public static void constructBlock(TextureManager manager, Block block, PShape shape, boolean negativeX, boolean positiveX, boolean negativeY, boolean positiveY, boolean negativeZ, boolean positiveZ, int x, int y, int z) {
+
+        shape.tint(150);
         if (negativeX)
+            //shape.fill(255, 0, 0, 255);
             constructLeft(manager, block, shape, x, y, z);
+        shape.tint(150);
         if (positiveX)
+            //shape.fill(255, 255, 0, 255);
             constructRight(manager, block, shape, x, y, z);
+        shape.tint(255);
         if (negativeY)
+            //shape.fill(255, 0, 255, 255);
             constructTop(manager, block, shape, x, y, z);
+        shape.tint(100);
         if (positiveY)
+            //shape.fill(255, 255, 255, 255);
             constructBottom(manager, block, shape, x, y, z);
+        shape.tint(150);
         if (negativeZ)
             constructBack(manager, block, shape, x, y, z);
+        shape.tint(150);
         if (positiveZ)
             constructFront(manager, block, shape, x, y, z);
     }
@@ -91,7 +102,7 @@ public class BlockGeometry {
     }
 
     private static void constructTop(TextureManager manager, Block block, PShape shape, int  x, int y, int z) {
-
+        shape.fill(0xFF0000);
         shape.vertex(vertices[indices[24]].x + x, vertices[indices[24]].y + y, vertices[indices[24]].z + z, manager.getTextureIndex(block.texture.TOP).minX, manager.getTextureIndex(block.texture.TOP).minY);
         shape.vertex(vertices[indices[25]].x + x, vertices[indices[25]].y + y, vertices[indices[25]].z + z, manager.getTextureIndex(block.texture.TOP).minX, manager.getTextureIndex(block.texture.TOP).maxY);
         shape.vertex(vertices[indices[26]].x + x, vertices[indices[26]].y + y, vertices[indices[26]].z + z, manager.getTextureIndex(block.texture.TOP).maxX, manager.getTextureIndex(block.texture.TOP).maxY);

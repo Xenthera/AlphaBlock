@@ -140,6 +140,8 @@ public class Player {
         PVector position = ray.getHitPostition();
         if (ray.hasTarget()) {
             app.pushStyle();
+            app.stroke(0);
+            app.strokeWeight(1);
             app.fill(0, 0, 255, 50);
             app.translate(0.5f + position.x, 0.5f + position.y, 0.5f + position.z);
             app.box(1.01f);
