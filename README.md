@@ -2,18 +2,13 @@
 
 A voxel engine game 
 
-### Features
-* Occluded faces
-* Texture atlas support
-* Chunk Support
-* Multiple Blocks Implemented
-* Custom Camera 
-* Player
+Update (10/12/19
+---
++ Fog
++ Leaves Transparency
++ Lighting framework
 
-### Planned
-* Chunk Manager
-* AABB Physics for Player
-* Better Terrain Generation
+![](https://i.imgur.com/WZdpSQ7.png)
 
 ![](https://image.ibb.co/eABaob/Screen_Shot_2018_01_27_at_6_30_46_PM.png)
 
