@@ -1,6 +1,7 @@
 package com.bobby.blocks.construction;
 
 import com.bobby.TextureManager;
+import com.bobby.World;
 import com.bobby.blocks.Block;
 import processing.core.PApplet;
 import processing.core.PShape;
@@ -54,6 +55,126 @@ public class BlockGeometry {
 
 
     };
+
+    public static void constructBlock(PApplet applet, TextureManager manager, World world, Block block, PShape shape, boolean negativeX, boolean positiveX, boolean negativeY, boolean positiveY, boolean negativeZ, boolean positiveZ, int x, int y, int z) {
+        if(block.renderType == Block.BlockRenderType.BLOCK) {
+            if (block.getName() != "Leaves") {
+//                int blockLight = (int) applet.map(applet.log(15 - block.lightLevel), 0, 3, 25, 255);
+//                blockLight = applet.max(blockLight, 25);
+//                blockLight = 255 - blockLight;
+
+                int blockLight = (int)applet.map(block.lightLevel, 0, 15, 0, 255);
+                int lightTop = (int)applet.map(1f * world.getBlock(x, y - 1, z).lightLevel, 0, 15, 0, 255);
+                int lightBottom = (int)applet.map(0.65f * world.getBlock(x, y + 1, z).lightLevel, 0, 15, 0, 255);
+                int lightFront = (int)applet.map(0.9f * world.getBlock(x, y, z + 1).lightLevel, 0, 15, 0, 255);
+                int lightBack = (int)applet.map(0.9f * world.getBlock(x, y, z - 1).lightLevel, 0, 15, 0, 255);
+                int lightLeft = (int)applet.map(0.75f * world.getBlock(x - 1, y, z).lightLevel, 0, 15, 0, 255);
+                int lightRight = (int)applet.map(0.75f * world.getBlock(x + 1, y, z).lightLevel, 0, 15, 0, 255);
+
+                shape.tint(lightLeft);
+                if (negativeX)
+                    //shape.fill(255, 0, 0, 255);
+                    constructLeft(manager, block, shape, x, y, z);
+
+                shape.tint(lightRight);
+                if (positiveX)
+                    //shape.fill(255, 255, 0, 255);
+                    constructRight(manager, block, shape, x, y, z);
+
+                if (block.getName() == "Grass") {
+                    shape.tint(lightTop * .4f, lightTop * .8f, lightTop * .2f);
+                } else {
+                    shape.tint(lightTop);
+                }
+                if (negativeY)
+                    //shape.fill(255, 0, 255, 255);
+                    constructTop(manager, block, shape, x, y, z);
+
+                shape.tint(lightBottom);
+                if (positiveY)
+                    //shape.fill(255, 255, 255, 255);
+                    constructBottom(manager, block, shape, x, y, z);
+                shape.tint(lightBack);
+                if (negativeZ)
+                    constructBack(manager, block, shape, x, y, z);
+                shape.tint(lightFront);
+                if (positiveZ)
+                    constructFront(manager, block, shape, x, y, z);
+            } else {
+                int blockLight = (int) applet.map(applet.log(15 - block.lightLevel), 0, 3, 25, 255);
+                blockLight = applet.max(blockLight, 25);
+                blockLight = 255 - blockLight;
+
+                int lightTop = (int)applet.map(1f * world.getBlock(x, y - 1, z).lightLevel, 0, 15, 0, 255);
+                int lightBottom = (int)applet.map(0.65f * world.getBlock(x, y + 1, z).lightLevel, 0, 15, 0, 255);
+                int lightFront = (int)applet.map(0.9f * world.getBlock(x, y, z + 1).lightLevel, 0, 15, 0, 255);
+                int lightBack = (int)applet.map(0.9f * world.getBlock(x, y, z - 1).lightLevel, 0, 15, 0, 255);
+                int lightLeft = (int)applet.map(0.75f * world.getBlock(x - 1, y, z).lightLevel, 0, 15, 0, 255);
+                int lightRight = (int)applet.map(0.75f * world.getBlock(x + 1, y, z).lightLevel, 0, 15, 0, 255);
+
+                shape.tint(0, lightLeft, 0);
+                if (negativeX)
+                    //shape.fill(255, 0, 0, 255);
+                    constructLeft(manager, block, shape, x, y, z);
+                shape.tint(0, lightRight, 0);
+                if (positiveX)
+                    //shape.fill(255, 255, 0, 255);
+                    constructRight(manager, block, shape, x, y, z);
+                shape.tint(0, lightTop, 0);
+                if (negativeY)
+                    //shape.fill(255, 0, 255, 255);
+                    constructTop(manager, block, shape, x, y, z);
+                shape.tint(0, lightBottom, 0);
+                if (positiveY)
+                    //shape.fill(255, 255, 255, 255);
+                    constructBottom(manager, block, shape, x, y, z);
+                shape.tint(0, lightBack, 0);
+                if (negativeZ)
+                    constructBack(manager, block, shape, x, y, z);
+                shape.tint(0, lightFront, 0);
+                if (positiveZ)
+                    constructFront(manager, block, shape, x, y, z);
+            }
+        }else if(block.renderType == Block.BlockRenderType.SPRITE){
+            int blockLight = (int) applet.map(applet.log(15 - block.lightLevel), 0, 3, 25, 255);
+            blockLight = applet.max(blockLight, 25);
+            blockLight = 255 - blockLight;
+
+            if (block.getName() == "PlantGrass") {
+                shape.tint(blockLight * .4f, blockLight * .8f, blockLight * .2f);
+            } else {
+                shape.tint(blockLight, 0);
+            }
+            shape.vertex(vertices[spriteIndices[0]].x + x, vertices[spriteIndices[0]].y + y, vertices[spriteIndices[0]].z + z, manager.getTextureIndex(block.texture.SIDES).maxX, manager.getTextureIndex(block.texture.SIDES).minY);
+            shape.vertex(vertices[spriteIndices[1]].x + x, vertices[spriteIndices[1]].y + y, vertices[spriteIndices[1]].z + z, manager.getTextureIndex(block.texture.SIDES).minX, manager.getTextureIndex(block.texture.SIDES).minY);
+            shape.vertex(vertices[spriteIndices[2]].x + x, vertices[spriteIndices[2]].y + y, vertices[spriteIndices[2]].z + z, manager.getTextureIndex(block.texture.SIDES).minX, manager.getTextureIndex(block.texture.SIDES).maxY);
+            shape.vertex(vertices[spriteIndices[3]].x + x, vertices[spriteIndices[3]].y + y, vertices[spriteIndices[3]].z + z, manager.getTextureIndex(block.texture.SIDES).maxX, manager.getTextureIndex(block.texture.SIDES).minY);
+            shape.vertex(vertices[spriteIndices[4]].x + x, vertices[spriteIndices[4]].y + y, vertices[spriteIndices[4]].z + z, manager.getTextureIndex(block.texture.SIDES).minX, manager.getTextureIndex(block.texture.SIDES).maxY);
+            shape.vertex(vertices[spriteIndices[5]].x + x, vertices[spriteIndices[5]].y + y, vertices[spriteIndices[5]].z + z, manager.getTextureIndex(block.texture.SIDES).maxX, manager.getTextureIndex(block.texture.SIDES).maxY);
+
+            shape.vertex(vertices[spriteIndices[6]].x + x, vertices[spriteIndices[6]].y + y, vertices[spriteIndices[6]].z + z, manager.getTextureIndex(block.texture.SIDES).maxX, manager.getTextureIndex(block.texture.SIDES).minY);
+            shape.vertex(vertices[spriteIndices[7]].x + x, vertices[spriteIndices[7]].y + y, vertices[spriteIndices[7]].z + z, manager.getTextureIndex(block.texture.SIDES).minX, manager.getTextureIndex(block.texture.SIDES).minY);
+            shape.vertex(vertices[spriteIndices[8]].x + x, vertices[spriteIndices[8]].y + y, vertices[spriteIndices[8]].z + z, manager.getTextureIndex(block.texture.SIDES).minX, manager.getTextureIndex(block.texture.SIDES).maxY);
+            shape.vertex(vertices[spriteIndices[9]].x + x, vertices[spriteIndices[9]].y + y, vertices[spriteIndices[9]].z + z, manager.getTextureIndex(block.texture.SIDES).maxX, manager.getTextureIndex(block.texture.SIDES).minY);
+            shape.vertex(vertices[spriteIndices[10]].x + x, vertices[spriteIndices[10]].y + y, vertices[spriteIndices[10]].z + z, manager.getTextureIndex(block.texture.SIDES).minX, manager.getTextureIndex(block.texture.SIDES).maxY);
+            shape.vertex(vertices[spriteIndices[11]].x + x, vertices[spriteIndices[11]].y + y, vertices[spriteIndices[11]].z + z, manager.getTextureIndex(block.texture.SIDES).maxX, manager.getTextureIndex(block.texture.SIDES).maxY);
+
+            shape.vertex(vertices[spriteIndices[12]].x + x, vertices[spriteIndices[12]].y + y, vertices[spriteIndices[12]].z + z, manager.getTextureIndex(block.texture.SIDES).maxX, manager.getTextureIndex(block.texture.SIDES).minY);
+            shape.vertex(vertices[spriteIndices[13]].x + x, vertices[spriteIndices[13]].y + y, vertices[spriteIndices[13]].z + z, manager.getTextureIndex(block.texture.SIDES).minX, manager.getTextureIndex(block.texture.SIDES).minY);
+            shape.vertex(vertices[spriteIndices[14]].x + x, vertices[spriteIndices[14]].y + y, vertices[spriteIndices[14]].z + z, manager.getTextureIndex(block.texture.SIDES).minX, manager.getTextureIndex(block.texture.SIDES).maxY);
+            shape.vertex(vertices[spriteIndices[15]].x + x, vertices[spriteIndices[15]].y + y, vertices[spriteIndices[15]].z + z, manager.getTextureIndex(block.texture.SIDES).maxX, manager.getTextureIndex(block.texture.SIDES).minY);
+            shape.vertex(vertices[spriteIndices[16]].x + x, vertices[spriteIndices[16]].y + y, vertices[spriteIndices[16]].z + z, manager.getTextureIndex(block.texture.SIDES).minX, manager.getTextureIndex(block.texture.SIDES).maxY);
+            shape.vertex(vertices[spriteIndices[17]].x + x, vertices[spriteIndices[17]].y + y, vertices[spriteIndices[17]].z + z, manager.getTextureIndex(block.texture.SIDES).maxX, manager.getTextureIndex(block.texture.SIDES).maxY);
+
+            shape.vertex(vertices[spriteIndices[18]].x + x, vertices[spriteIndices[18]].y + y, vertices[spriteIndices[18]].z + z, manager.getTextureIndex(block.texture.SIDES).maxX, manager.getTextureIndex(block.texture.SIDES).minY);
+            shape.vertex(vertices[spriteIndices[19]].x + x, vertices[spriteIndices[19]].y + y, vertices[spriteIndices[19]].z + z, manager.getTextureIndex(block.texture.SIDES).minX, manager.getTextureIndex(block.texture.SIDES).minY);
+            shape.vertex(vertices[spriteIndices[20]].x + x, vertices[spriteIndices[20]].y + y, vertices[spriteIndices[20]].z + z, manager.getTextureIndex(block.texture.SIDES).minX, manager.getTextureIndex(block.texture.SIDES).maxY);
+            shape.vertex(vertices[spriteIndices[21]].x + x, vertices[spriteIndices[21]].y + y, vertices[spriteIndices[21]].z + z, manager.getTextureIndex(block.texture.SIDES).maxX, manager.getTextureIndex(block.texture.SIDES).minY);
+            shape.vertex(vertices[spriteIndices[22]].x + x, vertices[spriteIndices[22]].y + y, vertices[spriteIndices[22]].z + z, manager.getTextureIndex(block.texture.SIDES).minX, manager.getTextureIndex(block.texture.SIDES).maxY);
+            shape.vertex(vertices[spriteIndices[23]].x + x, vertices[spriteIndices[23]].y + y, vertices[spriteIndices[23]].z + z, manager.getTextureIndex(block.texture.SIDES).maxX, manager.getTextureIndex(block.texture.SIDES).maxY);
+
+        }
+    }
 
     public static void constructBlock(PApplet applet, TextureManager manager, Block block, PShape shape, boolean negativeX, boolean positiveX, boolean negativeY, boolean positiveY, boolean negativeZ, boolean positiveZ, int x, int y, int z) {
         if(block.renderType == Block.BlockRenderType.BLOCK) {

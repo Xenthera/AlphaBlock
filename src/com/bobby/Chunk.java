@@ -182,7 +182,7 @@ public class Chunk {
                                     py = false;
                                 }
 
-                                BlockGeometry.constructBlock(applet, textureManager, world.getBlock(worldX, y, worldZ), meshes[i], nx, px, ny, py, nz, pz, x, y, z);
+                                BlockGeometry.constructBlock(applet, textureManager, world, world.getBlock(worldX, y, worldZ), meshes[i], nx, px, ny, py, nz, pz, x, y, z);
 
                             //meshes[i].tint(this.applet.map(world.getBlock(x, y, z).getLightLevel(), 0, 15, 50, 255));
 

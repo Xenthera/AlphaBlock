@@ -16,8 +16,8 @@ public class World {
 
     ArrayList<Chunk> chunks;
     //Temporary hard-coded values
-    int chunkWidth = 16;
-    int chunkLength = 16;
+    int chunkWidth = 2;
+    int chunkLength = 2;
     boolean isLoaded = false;
     boolean isLoading = false;
     int x_blocks = chunkWidth * 16;
