@@ -49,8 +49,8 @@ public class Player {
         if (keys.containsKey('d') && keys.get('d')) velocity.sub(PVector.mult(camera.right, speed));
         if (keys.containsKey('w') && keys.get('w')) velocity.add(PVector.mult(camera.forward, speed));
         if (keys.containsKey('s') && keys.get('s')) velocity.sub(PVector.mult(camera.forward, speed));
-        if (keys.containsKey('q') && keys.get('q')) velocity.add(PVector.mult(camera.up, speed * 0.1f));
-        if (keys.containsKey('e') && keys.get('e')) velocity.sub(PVector.mult(camera.up, speed * 0.1f));
+        if (keys.containsKey('q') && keys.get('q')) velocity.add(PVector.mult(camera.up, speed));
+        if (keys.containsKey('e') && keys.get('e')) velocity.sub(PVector.mult(camera.up, speed));
         velocity.x *= friction;
         velocity.z *= friction;
         position = this.checkCollisions(this.position.add(this.velocity));
@@ -140,9 +140,9 @@ public class Player {
         PVector position = ray.getHitPostition();
         if (ray.hasTarget()) {
             app.pushStyle();
-            app.stroke(0);
-            app.strokeWeight(1);
-            app.fill(0, 0, 255, 50);
+            app.stroke(255);
+            app.strokeWeight(3);
+            app.fill(0, 0, 255, 0);
             app.translate(0.5f + position.x, 0.5f + position.y, 0.5f + position.z);
             app.box(1.01f);
             app.popStyle();
@@ -176,9 +176,12 @@ public class Player {
 
                 if (app.mouseButton == app.LEFT) {
                     world.removeBlock((int) position.x, (int) position.y, (int) position.z, true);
+                    Light_Propogation.PropgateStrip(world, (int) position.x, (int) position.z);
                 } else if (app.mouseButton == app.RIGHT) {
                     if (!nPlayerPosition.equals(nPosition) && !nPlayerPositionPlusOne.equals(nPosition)) {
+
                         world.setBlock(new BlockStoneBrick(), (int) position.x + (int) normal.x, (int) position.y + (int) normal.y, (int) position.z + (int) normal.z, true);
+                        Light_Propogation.PropgateStrip(world, (int) position.x + (int) normal.x, (int) position.z + (int) normal.z);
                     }
                 }
             }

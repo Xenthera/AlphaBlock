@@ -36,17 +36,16 @@ public class World {
     }
 
     public PVector getRandomSpawnPoint(){
-        int randX = (int)applet.random(16 * chunkWidth) - 1;
-        int randZ = (int)applet.random(16 * chunkLength) - 1;
-        int randY = 0;
-        for (int i = 0; i < 256; i++) {
-            if(this.getBlock(randX, i, randZ).isSolid()){
-                randY = i;
-                break;
-            }
+        int randX = (int)applet.random(x_blocks);
+        int randY = (int)applet.random(y_blocks);
+        int randZ = (int)applet.random(z_blocks);
+        if(this.getBlock(randX, randY, randZ).getName() == "Grass" && !this.getBlock(randX,randY - 1, randZ).isSolid() &&
+                                                                     !this.getBlock(randX,randY - 2, randZ).isSolid()){
+            return new PVector(randX, randY, randZ);
         }
 
-        return new PVector(randX, randY, randZ);
+        System.out.println("Spawn failed, trying again");
+        return getRandomSpawnPoint();
     }
 
     public void createTree(int x, int y, int z){
@@ -55,15 +54,14 @@ public class World {
 
         height = (int) applet.random(4, 8);
 
-        if(applet.random(1) > 0.5) {
+        if(applet.random(1) > 0.4) {
 
             for (int k = 0; k < height; k++) {
                 if (k < height / 2) {
                     if (type >= 0.5f && k % 2 == 0) {
                         for (int treeWidth = (k == height / 2 - 1 ? -2 : -1); treeWidth <= (k == height / 2 - 1 ? 2 : 1); treeWidth++) {
                             for (int treeLength = (k == height / 2 - 1 ? -2 : -1); treeLength <= (k == height / 2 - 1 ? 2 : 1); treeLength++) {
-                                if (applet.random(1) < 0.8f)
-                                    this.setBlock(new BlockOakLeaves(), x + treeWidth, y - height + k, z + treeLength, false);
+                                this.setBlock(new BlockOakLeaves(), x + treeWidth, y - height + k, z + treeLength, false);
                             }
                         }
                     } else {
@@ -74,7 +72,7 @@ public class World {
                         }
                     }
                 }
-                this.setBlock(new BlockOak(), x, y - height + k, z, false);
+                this.setBlock(new BlockOak(), x, y - (height - 1) + k, z, false);
             }
             this.setBlock(new BlockOakLeaves(), x, y - height - 1, z, false);
         }else{
@@ -83,7 +81,6 @@ public class World {
                     if (type >= 0.5f && k % 2 == 0) {
                         for (int treeWidth = (k == height / 2 - 1 ? -2 : -1); treeWidth <= (k == height / 2 - 1 ? 2 : 1); treeWidth++) {
                             for (int treeLength = (k == height / 2 - 1 ? -2 : -1); treeLength <= (k == height / 2 - 1 ? 2 : 1); treeLength++) {
-                                if (applet.random(1) < 0.8f)
                                     this.setBlock(new BlockBirchLeaves(), x + treeWidth, y - height + k, z + treeLength, false);
                             }
                         }
@@ -95,7 +92,7 @@ public class World {
                         }
                     }
                 }
-                this.setBlock(new BlockBirch(), x, y - height + k, z, false);
+                this.setBlock(new BlockBirch(), x, y - (height - 1) + k, z, false);
             }
             this.setBlock(new BlockBirchLeaves(), x, y - height - 1, z, false);
         }
@@ -128,7 +125,7 @@ public class World {
             for (int j = 0; j < this.y_blocks; j++) {
                 for (int k = 0; k < this.z_blocks; k++) {
 
-                    float rand = applet.pow(j / ((float)y_blocks) * 2, 1.1024f) + fastNoise.GetValueFractal(i * frequency, j * frequency, k * frequency) * 0.60f;
+                    float rand = applet.pow(j / ((float)y_blocks) * 4, 1.1024f) + fastNoise.GetValueFractal(i * frequency, j * frequency, k * frequency) * 0.60f;
                     if (rand > 0.5f)
                     {
                         this.setBlock(new BlockStone(), i, j + 120, k, false);
@@ -159,7 +156,7 @@ public class World {
                 for (int y = 0; y < this.y_blocks; y++) {
 
                     if(this.getBlock(x,y,z).getName() != "Air"){
-                        if(y / ((float)this.y_blocks) > 0.9f){
+                        if(y / ((float)this.y_blocks) > 0.65f){
                             if(fastNoise.GetValueFractal(x * frequency * 5, z * frequency * 5) >= -0.2){
                                 this.setBlock(new BlockSand(), x,y,z,false);
                                 this.setBlock(new BlockSandstone(), x,y + 1,z,false);
@@ -176,6 +173,9 @@ public class World {
                             this.setBlock(new BlockDirt(), x,y + 1,z,false);
                             this.setBlock(new BlockDirt(), x,y + 2,z,false);
                             this.setBlock(new BlockDirt(), x,y + 3,z,false);
+                            if(applet.random(1) < 0.4) {
+                                this.setBlock(new BlockPlantGrass(), x, y - 1, z, false);
+                            }
                         }
                         break;
                     }
@@ -192,98 +192,31 @@ public class World {
                 for (int y = 0; y < this.y_blocks; y++) {
 
                     if(this.getBlock(x,y,z).getName() != "Air"){
-                        if(applet.random(1) > 0.945f && (getBlock(x,y,z).getName().equals("Grass"))){
-                            this.createTree(x ,y ,z);
+                        if(applet.random(1) > 0.895f && (getBlock(x,y,z).getName().equals("Grass"))){
+                            //this.createTree(x ,y ,z);
+                            if(applet.random(1) > 0.5) {
+                                this.setBlock(new BlockFlower(), x, y - 1, z, false);
+                            }else{
+                                this.createTree(x,y,z);
+                            }
+                        }else if(applet.random(1) > 0.98 && (getBlock(x,y,z).getName().equals("Sand"))){
+                            if(applet.random(1) < 0.15) {
+                                int rand = (int) applet.random(5);
+                                for (int i = 1; i <= rand + 1; i++) {
+                                    this.setBlock(new BlockReed(), x, y - i, z, false);
+                                }
+                            }else{
+                                this.setBlock(new BlockDeadShrub(), x, y - 1, z, false);
+                            }
                         }
                         break;
                     }
                 }
             }
         }
-        chunkCount = 0;
-        for (int x = 0; x < this.x_blocks; x++) {
-            for (int z = 0; z < this.z_blocks; z++) {
 
-                int natural = 15;
+        Light_Propogation.PropogateWorld(this);
 
-                for (int y = 0; y < this.y_blocks; y++) {
-
-                    this.getBlock(x,y,z).setLightLevel(natural);
-
-                    if(this.getBlock(x,y,z).isOpaque() || this.getBlock(x,y,z).getName() == "Leaves"){
-                        natural = 0;
-                    }
-
-                    chunkCount++;
-                    this.progressType = "Generating Lighting: " + (int)chunkCount + " of " + (x_blocks * y_blocks * z_blocks);
-                    this.progress = chunkCount / (x_blocks * y_blocks * z_blocks);
-                }
-            }
-        }
-        ArrayList<PVector> light_queue = new ArrayList<>();
-        chunkCount = 0;
-        for (int x = 0; x < this.x_blocks; x++) {
-            for (int z = 0; z < this.z_blocks; z++) {
-                for (int y = 0; y < this.y_blocks; y++) {
-
-                    if(this.getBlock(x,y,z).getLightLevel() == 0){
-
-                        if(     this.getBlock(x + 1, y, z).getLightLevel() == 15 ||
-                                this.getBlock(x - 1, y, z).getLightLevel() == 15 ||
-
-                                this.getBlock(x, y + 1, z).getLightLevel() == 15 ||
-                                this.getBlock(x, y - 1, z).getLightLevel() == 15 ||
-
-                                this.getBlock(x, y, z + 1).getLightLevel() == 15 ||
-                                this.getBlock(x, y, z - 1).getLightLevel() == 15)
-                        {
-                            this.getBlock(x,y,z).setLightLevel(14);
-                            light_queue.add(new PVector(x,y,z));
-                        }
-                    }
-                    chunkCount++;
-                    this.progressType = "Propagating Light: " + (int)chunkCount + "/" + (x_blocks * y_blocks * z_blocks);
-                    this.progress = chunkCount / (x_blocks * y_blocks * z_blocks);
-                }
-            }
-        }
-
-        while(light_queue.size() > 0){
-            int x = (int)light_queue.get(light_queue.size() - 1).x;
-            int y = (int)light_queue.get(light_queue.size() - 1).y;
-            int z = (int)light_queue.get(light_queue.size() - 1).z;
-
-            light_queue.remove(light_queue.size() - 1);
-
-            int current_value = this.getBlock(x,y,z).getLightLevel();
-
-            if(this.inBounds(x + 1,y,z) && this.getBlock(x + 1,y,z).getLightLevel() < current_value - 1){
-                this.getBlock(x + 1, y, z).setLightLevel(current_value-1);
-                light_queue.add(new PVector(x + 1, y, z));
-            }
-            if(this.inBounds(x - 1,y,z) && this.getBlock(x - 1,y,z).getLightLevel() < current_value - 1){
-                this.getBlock(x - 1, y, z).setLightLevel(current_value-1);
-                light_queue.add(new PVector(x - 1, y, z));
-            }
-
-            if(this.inBounds(x, y + 1, z) && this.getBlock(x, y + 1, z).getLightLevel() < current_value - 1){
-                this.getBlock(x, y + 1, z).setLightLevel(current_value-1);
-                light_queue.add(new PVector(x, y + 1, z));
-            }
-            if(this.inBounds(x, y - 1, z) && this.getBlock(x, y - 1, z).getLightLevel() < current_value - 1){
-                this.getBlock(x, y - 1, z).setLightLevel(current_value-1);
-                light_queue.add(new PVector(x, y - 1, z));
-            }
-
-            if(this.inBounds(x, y, z + 1) && this.getBlock(x, y, z + 1).getLightLevel() < current_value - 1){
-                this.getBlock(x, y, z + 1).setLightLevel(current_value-1);
-                light_queue.add(new PVector(x, y, z + 1));
-            }
-            if(this.inBounds(x, y, z - 1) && this.getBlock(x,y,z-1).getLightLevel() < current_value - 1){
-                this.getBlock(x, y, z - 1).setLightLevel(current_value-1);
-                light_queue.add(new PVector(x, y, z - 1));
-            }
-        }
 //        for(Chunk chunk : this.chunks){
 //
 //            chunkCount++;
@@ -369,6 +302,8 @@ public class World {
         int blockX = x % 16;
         int chunkZ = z / 16;
         int blockZ = z % 16;
+
+
 
         chunks.get(chunkX * chunkWidth + chunkZ).setBlock(block, blockX, y, blockZ, setByUser);
     }

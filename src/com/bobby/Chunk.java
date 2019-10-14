@@ -149,7 +149,7 @@ public class Chunk {
                             int worldX = (int)worldSpace.x;
                             int worldZ = (int)worldSpace.z;
 
-                            if (world.getBlock(worldX, y, worldZ).isSolid() == false) {
+                            if (world.getBlock(worldX, y, worldZ).getName() == "Air") {
                                 continue;
                             }
 

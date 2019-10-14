@@ -1,9 +1,6 @@
 package com.bobby;
 
-import com.bobby.blocks.Block;
-import com.bobby.blocks.BlockGrass;
-import com.bobby.blocks.BlockOakLeaves;
-import com.bobby.blocks.BlockSandstone;
+import com.bobby.blocks.*;
 import com.bobby.blocks.construction.BlockGeometry;
 import processing.core.*;
 import processing.opengl.PGL;
@@ -20,7 +17,7 @@ public class Main extends PApplet{
 
     PJOGL pgl;
 
-    PShader blockShader, blockShaderUnlit;
+    PShader blockShader, blockShaderUnlit, testShader;
 
     PShape loadingMesh;
 
@@ -58,15 +55,19 @@ public class Main extends PApplet{
 
         blockShaderUnlit = loadShader("com/bobby/FragUnlit.glsl", "com/bobby/VertUnlit.glsl");
 
+        testShader = loadShader("com/bobby/FragWater.glsl", "com/bobby/Vert.glsl");
+
         if(!world.isLoaded){
             thread("loadWorldThread");
         }
         Block loadingBlock = new BlockGrass();
-        loadingBlock.setLightLevel(15);
+        Block loadingBlock2 = new BlockFlower();
         loadingMesh = createShape();
         loadingMesh.beginShape(PConstants.TRIANGLE);
         loadingMesh.texture(world.textureManager.getTextureAtlas());
         BlockGeometry.constructBlock(this, world.textureManager, loadingBlock, loadingMesh, true, true, true, true, true, true, 0, 0, 0);
+        BlockGeometry.constructBlock(this, world.textureManager, loadingBlock2, loadingMesh, true, true, true, true, true, true, 0, -1, 0);
+
         loadingMesh.noStroke();
         loadingMesh.endShape();
     }
@@ -82,16 +83,22 @@ public class Main extends PApplet{
         background(0);
         pushMatrix();
         resetMatrix();
-        translate(0, -2.4f, 0);
         perspective(radians(50), (float)width/(float)height, 0.1f, 1000);
         //translate(-0.5f, 0, -0.5f);
         noFill();
         stroke(255);
 
-        translate(0, 0, -7);
+        translate(0, -2.2f, -8);
         rotate(millis() * 0.001f, 0, 1, 0);
         translate(-0.5f, 0, -0.5f);
+        pgl = (PJOGL) beginPGL();
+        pgl.frontFace(PGL.CCW);
+        pgl.enable(PGL.CULL_FACE);
+        testShader.set("iTime", millis() * 1000);
+        shader(blockShader);
         shape(this.loadingMesh);
+        resetShader();
+        endPGL();
         popMatrix();
 
         textAlign(CENTER, BOTTOM);
@@ -112,10 +119,11 @@ public class Main extends PApplet{
             loadingDraw();
             return;
         }
-
         pgl = (PJOGL) beginPGL();
         pgl.frontFace(PGL.CCW);
         pgl.enable(PGL.CULL_FACE);
+
+
 
         background(98, 144, 219);
 

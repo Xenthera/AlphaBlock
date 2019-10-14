@@ -105,7 +105,7 @@ public class RayCaster {
 
                 }else {
 
-                    if (this.world.getBlock(ix, iy, iz).isSolid()) {
+                    if (this.world.getBlock(ix, iy, iz).getName() != "Air") {
                         ray.hitPostition.x = ix;
                         ray.hitPostition.y = iy;
                         ray.hitPostition.z = iz;
