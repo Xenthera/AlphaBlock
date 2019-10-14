@@ -26,8 +26,10 @@ void main() {
 
     if(fragColor.w == 0.0f){
         discard;
+    }else{
+    gl_FragColor = vec4(mix(fragColor.xyz * vertex_color.xyz, sky_color, min(1.0f, frag_distance / 30000)), fragColor.w);
     }
 
 
-    gl_FragColor = vec4(mix(fragColor.xyz * vertex_color.xyz, sky_color, min(1.0f, frag_distance / 30000)), fragColor.w);
+
 }

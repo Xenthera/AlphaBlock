@@ -43,7 +43,7 @@ public class Main extends PApplet{
 
         //pg.textureSampling(3);
         gui = createGraphics(width, height);
-        surface.setResizable(true);
+        frame.setResizable(true);
 
         font = loadFont("VCR48.vlw");
         textFont(font, 45);
