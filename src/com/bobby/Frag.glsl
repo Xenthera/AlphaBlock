@@ -27,9 +27,12 @@ void main() {
 
     if(fragColor.w == 0.0f){
         discard;
-    }else{
-    gl_FragColor = vec4((gl_FragCoord.z / gl_FragCoord.w) / 100,(gl_FragCoord.z / gl_FragCoord.w) / 100,(gl_FragCoord.z / gl_FragCoord.w) / 100, 1.0f);//vec4(mix(fragColor.xyz * vertex_color.xyz, sky_color, min(1.0f, frag_distance / 30000)), fragColor.w);
     }
+
+    float depth = (gl_FragCoord.z / gl_FragCoord.w) / 100;
+
+    gl_FragColor = vec4( depth, depth, depth, 1.0f);//vec4(mix(fragColor.xyz * vertex_color.xyz, sky_color, min(1.0f, frag_distance / 30000)), fragColor.w);
+
 
 
 
