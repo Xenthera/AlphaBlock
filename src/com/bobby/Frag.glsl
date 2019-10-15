@@ -6,6 +6,7 @@ precision mediump int;
 const vec3 sky_color = vec3(98.0f / 255.0f, 144.0f / 255.0f, 219.0f / 255.0f);
 
 uniform sampler2D texture;
+uniform float clipDistance = 1;
 
 varying vec4 vertTexCoord;
 
@@ -27,7 +28,7 @@ void main() {
     if(fragColor.w == 0.0f){
         discard;
     }else{
-    gl_FragColor = vec4(mix(fragColor.xyz * vertex_color.xyz, sky_color, min(1.0f, frag_distance / 30000)), fragColor.w);
+    gl_FragColor = vec4((gl_FragCoord.z / gl_FragCoord.w) / 100,(gl_FragCoord.z / gl_FragCoord.w) / 100,(gl_FragCoord.z / gl_FragCoord.w) / 100, 1.0f);//vec4(mix(fragColor.xyz * vertex_color.xyz, sky_color, min(1.0f, frag_distance / 30000)), fragColor.w);
     }
 
 

@@ -83,7 +83,7 @@ public class Main extends PApplet{
         background(0);
         pushMatrix();
         resetMatrix();
-        perspective(radians(50), (float)width/(float)height, 0.1f, 1000);
+        perspective(radians(50), (float)width/(float)height, 0.1f, 10);
         //translate(-0.5f, 0, -0.5f);
         noFill();
         stroke(255);
@@ -127,7 +127,7 @@ public class Main extends PApplet{
 
         background(98, 144, 219);
 
-        perspective(radians(90), (float)width/(float)height, 0.1f, 1000);
+        perspective(radians(90), (float)width/(float)height, 0.1f, 100);
 
 
 
