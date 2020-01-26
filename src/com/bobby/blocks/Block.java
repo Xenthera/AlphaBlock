@@ -33,4 +33,9 @@ public class Block {
     public String getName(){
         return this.name;
     }
+
+    public Block getBlock(int x){
+        float y = 1;
+        return new BlockFlower();
+    }
 }

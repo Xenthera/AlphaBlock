@@ -1,4 +1,6 @@
 uniform mat4 transform;
+uniform mat4 modelview;
+uniform mat4 projection;
 uniform mat3 normalMatrix;
 uniform vec3 lightNormal;
 uniform mat4 texMatrix;
@@ -20,7 +22,6 @@ void main() {
   gl_Position = transform * position;
 
   vertColor = color;
-  vertex_color = color;
   vertTexCoord = texMatrix * vec4(texCoord, 1.0, 1.0);
   vertNormal = normalize(normalMatrix * normal);
   vertLightDir = -lightNormal;

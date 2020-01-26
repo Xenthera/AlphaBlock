@@ -3,6 +3,7 @@ package com.bobby;
 import com.jogamp.newt.opengl.GLWindow;
 import processing.core.PApplet;
 import processing.core.PConstants;
+import processing.core.PGraphics;
 import processing.core.PVector;
 
 import java.awt.*;
@@ -105,8 +106,8 @@ public class FirstPersonCamera {
 
     }
 
-    public void draw(){
-        app.camera(this.player.position.x, this.player.position.y, this.player.position.z, center.x, center.y, center.z, up.x, up.y, up.z);
+    public void draw(PGraphics graphics){
+        graphics.camera(this.player.position.x, this.player.position.y, this.player.position.z, center.x, center.y, center.z, up.x, up.y, up.z);
     }
 
 

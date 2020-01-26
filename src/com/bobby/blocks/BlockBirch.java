@@ -1,4 +1,4 @@
-package com.bobby;
+package com.bobby.blocks;
 
 import com.bobby.blocks.Block;
 import com.bobby.blocks.texture.BlockSimpleMultiTexture;

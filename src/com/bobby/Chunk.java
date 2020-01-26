@@ -6,6 +6,7 @@ import com.bobby.blocks.BlockOak;
 import com.bobby.blocks.BlockOakLeaves;
 import com.bobby.blocks.construction.BlockGeometry;
 import processing.core.PApplet;
+import processing.core.PGraphics;
 import processing.core.PShape;
 import processing.core.PVector;
 
@@ -210,11 +211,11 @@ public class Chunk {
     }
 
 
-    public void draw() {
+    public void draw(PGraphics graphics) {
         if (isDirty())
             regenerate();
         for (PShape mesh : meshes) {
-            this.applet.shape(mesh);
+            graphics.shape(mesh);
         }
     }
 }

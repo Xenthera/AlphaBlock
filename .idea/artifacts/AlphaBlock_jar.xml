@@ -21,6 +21,7 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/Libraries/gluegen-rt-natives-linux-aarch64.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/Libraries/gluegen-rt-natives-linux-i586.jar" path-in-jar="/" />
       <element id="dir-copy" path="$PROJECT_DIR$/Data" />
+      <element id="library" level="project" name="Libs" />
     </root>
   </artifact>
 </component>

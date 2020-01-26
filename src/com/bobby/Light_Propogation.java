@@ -129,5 +129,7 @@ public class Light_Propogation {
                 light_queue.add(new PVector(x, y, z - 1));
             }
         }
+
     }
+
 }

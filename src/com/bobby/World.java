@@ -4,6 +4,7 @@ import com.bobby.FastNoise.FastNoise;
 import com.bobby.blocks.*;
 import com.bobby.blocks.BlockBedrock;
 import processing.core.PApplet;
+import processing.core.PGraphics;
 import processing.core.PVector;
 
 import java.util.ArrayList;
@@ -259,13 +260,13 @@ public class World {
         this.isLoading = false;
     }
 
-    public void draw(){
+    public void draw(PGraphics graphics){
         for (int i = 0; i < chunkWidth; i++) {
             for (int j = 0; j < chunkLength; j++) {
-                applet.pushMatrix();
-                applet.translate(i * 16, 0, j * 16);
-                chunks.get(i * chunkWidth + j).draw();
-                applet.popMatrix();
+                graphics.pushMatrix();
+                graphics.translate(i * 16, 0, j * 16);
+                chunks.get(i * chunkWidth + j).draw(graphics);
+                graphics.popMatrix();
             }
         }
     }
@@ -309,6 +310,7 @@ public class World {
     }
 
     public void removeBlock(int x, int y, int z, boolean setByUser) {
+        this.setBlock(null, x,y,z,false);
         this.setBlock(new BlockAir(), x, y, z, setByUser);
     }
 

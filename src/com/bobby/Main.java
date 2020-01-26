@@ -10,21 +10,23 @@ import processing.opengl.PShader;
 
 
 public class Main extends PApplet{
-    private PGraphics gui;
+    private PGraphics depthBuffer;
     private World world;
 
     PFont font;
 
     PJOGL pgl;
 
-    PShader blockShader, blockShaderUnlit, testShader;
+    PShader blockShader, blockShaderUnlit, depthBufferShader;
 
     PShape loadingMesh;
 
+    MemoryProfiler profiler;
 
+    PGraphicsOpenGL pg;
 
     private boolean lightingEnabled = true;
-
+    PVector lightDir = new PVector();
     private Player player;
 
     public void settings(){
@@ -33,16 +35,19 @@ public class Main extends PApplet{
     }
 
     public void setup(){
-        PGraphicsOpenGL pg = (PGraphicsOpenGL)g;
+        pg = (PGraphicsOpenGL)g;
         println(PGraphicsOpenGL.OPENGL_VERSION);
         textureMode(NORMAL);
         background(0);
+
+
+        profiler = new MemoryProfiler();
 
         world = new World(this);
         player = new Player(this, world);
 
         //pg.textureSampling(3);
-        gui = createGraphics(width, height);
+        depthBuffer = createGraphics(1024, 1024, P3D);
         frame.setResizable(true);
 
         font = loadFont("VCR48.vlw");
@@ -51,11 +56,11 @@ public class Main extends PApplet{
         hint(DISABLE_TEXTURE_MIPMAPS);
         ((PGraphicsOpenGL)g).textureSampling(2);
 
-        blockShader = loadShader("com/bobby/Frag.glsl", "com/bobby/Vert.glsl");
+        blockShader = loadShader("com/bobby/Shaders/Frag.glsl", "com/bobby/Shaders/Vert.glsl");
 
-        blockShaderUnlit = loadShader("com/bobby/FragUnlit.glsl", "com/bobby/VertUnlit.glsl");
+        blockShaderUnlit = loadShader("com/bobby/Shaders/FragUnlit.glsl", "com/bobby/Shaders/VertUnlit.glsl");
 
-        testShader = loadShader("com/bobby/FragWater.glsl", "com/bobby/Vert.glsl");
+        depthBufferShader = loadShader("com/bobby/Shaders/FragDepth.glsl", "com/bobby/Shaders/VertDepth.glsl");
 
         if(!world.isLoaded){
             thread("loadWorldThread");
@@ -84,76 +89,83 @@ public class Main extends PApplet{
         pushMatrix();
         resetMatrix();
         perspective(radians(50), (float)width/(float)height, 0.1f, 1000);
-        //translate(-0.5f, 0, -0.5f);
         noFill();
         stroke(255);
-
         translate(0, -2.2f, -8);
         rotate(millis() * 0.001f, 0, 1, 0);
         translate(-0.5f, 0, -0.5f);
         pgl = (PJOGL) beginPGL();
         pgl.frontFace(PGL.CCW);
         pgl.enable(PGL.CULL_FACE);
-        testShader.set("iTime", millis() * 1000);
+
         shader(blockShader);
         shape(this.loadingMesh);
         resetShader();
         endPGL();
         popMatrix();
 
-        textAlign(CENTER, BOTTOM);
-        //text("Loading World", width / 2, height / 2);
+        ortho();
+
+
+        profiler.draw(this, 10, 10);
+        textFont(font, 45);
+        textAlign(CENTER, CENTER);
         fill(0,100,255);
         text("Loading:\n" + this.world.progressType, width / 2, height / 2);
         noStroke();
-        rect(width / 3, height / 2 + 40, world.progress * (width / 3), 50);
+        rect(width / 3, height / 3 * 2 + 10, world.progress * (width / 3), 50);
         noFill();
         stroke(255);
         strokeWeight(6);
-        rect(width / 3 - 10, height / 2 + 30, (width / 3) + 20, 70, 0);
+        rect(width / 3 - 10, height / 3 * 2, (width / 3) + 20, 70, 0);
+
     }
 
+
     public void draw(){
+
+        float lightAngle = frameCount * 0.002f;
+        lightDir.set(sin(lightAngle) * 160, 160, cos(lightAngle) * 160);
 
         if(world.isLoading){
             loadingDraw();
             return;
         }
+
+        //--------------------------------
+        //Main Pass
+        //--------------------------------
         pgl = (PJOGL) beginPGL();
         pgl.frontFace(PGL.CCW);
         pgl.enable(PGL.CULL_FACE);
-
-
-
+        player.update();
         background(98, 144, 219);
+        perspective(radians(90), (float)width/(float)height, 0.1f, 400);
+        shader(blockShader);
+        world.draw(this.getGraphics());
 
-        perspective(radians(90), (float)width/(float)height, 0.1f, 1000);
-
-
-
-        shader(lightingEnabled ? blockShader : blockShaderUnlit);
-        world.draw();
-        resetShader();
-
-        player.draw();
+        player.draw(this.getGraphics());
 
         endPGL();
-        if(gui.width != width || gui.height != height) {
-            gui.setSize(width, height);
-        }
+
+        resetShader();
+
+        //--------------------------------
+        //GUI Pass
+        //--------------------------------
 
         pushMatrix();
         resetMatrix();
         ortho();
-        noLights();
         translate(-width / 2, -height / 2);
         drawGUI();
+
         popMatrix();
 
     }
 
     private void drawGUI() {
-        //graphics.noSmooth();
+
         pushStyle();
         noStroke();
         fill(255);
@@ -169,6 +181,7 @@ public class Main extends PApplet{
         text("Z: " + String.format("%.02f", player.position.z), 10,64);
         text("L: Lighting on/off", 10,82);
         text("F: Show Mouse", 10,100);
+        profiler.draw(this, 10, 118);
         popStyle();
     }
 

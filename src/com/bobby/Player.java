@@ -4,6 +4,7 @@ import com.bobby.Math.Ray;
 import com.bobby.Math.RayCaster;
 import com.bobby.blocks.BlockStoneBrick;
 import processing.core.PApplet;
+import processing.core.PGraphics;
 import processing.core.PVector;
 
 import java.util.HashMap;
@@ -33,12 +34,12 @@ public class Player {
         velocity = new PVector(0f, 0f, 0f);
     }
 
-    public void draw() {
-        this.drawFocusedBlock();
+    public void draw(PGraphics graphics) {
+        this.drawFocusedBlock(graphics);
 
-        this.update();
 
-        this.camera.draw();
+
+        this.camera.draw(graphics);
 
     }
 
@@ -134,18 +135,18 @@ public class Player {
     }
 
 
-    private void drawFocusedBlock() {
+    private void drawFocusedBlock(PGraphics graphics) {
         PVector vector = getSightVector();
         Ray ray = rayCaster.traceRay(this.position, vector, 80);
         PVector position = ray.getHitPostition();
         if (ray.hasTarget()) {
-            app.pushStyle();
-            app.stroke(255);
-            app.strokeWeight(3);
-            app.fill(0, 0, 255, 0);
-            app.translate(0.5f + position.x, 0.5f + position.y, 0.5f + position.z);
-            app.box(1.01f);
-            app.popStyle();
+            graphics.pushStyle();
+            graphics.stroke(255);
+            graphics.strokeWeight(3);
+            graphics.fill(0, 0, 255, 0);
+            graphics.translate(0.5f + position.x, 0.5f + position.y, 0.5f + position.z);
+            graphics.box(1.01f);
+            graphics.popStyle();
         }
 
 
