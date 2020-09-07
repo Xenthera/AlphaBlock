@@ -10,5 +10,6 @@ public class BlockBirch extends Block{
         texture.setTOP(5,1);
         texture.setBOTTOM(5,1);
         texture.setSIDES(5,7);
+        this.name = "Birch Log";
     }
 }

@@ -6,7 +6,7 @@ import processing.core.PImage;
 
 public class TextureManager {
 
-    PImage textureAtlas;
+    public PImage textureAtlas;
 
     private int imageSize, individualTextureSize;
 

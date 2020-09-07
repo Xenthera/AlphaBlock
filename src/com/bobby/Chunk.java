@@ -9,6 +9,7 @@ import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.core.PShape;
 import processing.core.PVector;
+import processing.opengl.PShader;
 
 import java.util.ArrayList;
 
@@ -17,6 +18,8 @@ public class Chunk {
     private PApplet applet;
 
     private PShape meshes[];
+
+    private PShape nonOpaqueMeshes[];
 
     public TextureManager textureManager;
 
@@ -31,6 +34,7 @@ public class Chunk {
     ArrayList<Block[][][]> subChunks;
 
     boolean[] subChunkDirtyList; // Flag to check if subchunk needs rebuilding
+    boolean[] subNonOpaqueChunkDiryList;
 
 
     public Chunk(PApplet applet, World world, int x, int y) {
@@ -44,6 +48,7 @@ public class Chunk {
 
         subChunks = new ArrayList();
         meshes = new PShape[chunkStackHeight];
+        nonOpaqueMeshes = new PShape[chunkStackHeight];
         subChunkDirtyList = new boolean[chunkStackHeight];
 
         //Initialize Everything
@@ -51,6 +56,7 @@ public class Chunk {
             Block[][][] subChunk = new Block[CHUNK_WIDTH][CHUNK_HEIGHT][CHUNK_LENGTH];
             subChunks.add(subChunk);
             meshes[i] = this.applet.createShape();
+            nonOpaqueMeshes[i] = this.applet.createShape();
             subChunkDirtyList[i] = true;
         }
 
@@ -146,44 +152,110 @@ public class Chunk {
                     for (int y = 0 + (i * cheight); y < cheight + (i * cheight); y++) {
                         for (int z = 0; z < clength; z++) {
 
-                            PVector worldSpace = toWorldSpace(x,y,z);
-                            int worldX = (int)worldSpace.x;
-                            int worldZ = (int)worldSpace.z;
+                            PVector worldSpace = toWorldSpace(x, y, z);
+                            int worldX = (int) worldSpace.x;
+                            int worldZ = (int) worldSpace.z;
 
-                            if (world.getBlock(worldX, y, worldZ).getName() == "Air") {
+                            if (world.getBlock(worldX, y, worldZ).isAir() || (!world.getBlock(worldX, y, worldZ).isOpaque() && world.getBlock(worldX, y, worldZ).isGlassLike())) {
                                 continue;
                             }
 
-                                boolean nx = faceDefault;
-                                if (worldX > 0) {
-                                    nx = !world.getBlock(worldX - 1, y, worldZ).isSolid() || !world.getBlock(worldX - 1, y, worldZ).isOpaque();
-                                }
-                                boolean px = faceDefault;
-                                if (worldX < world.chunkWidth * CHUNK_WIDTH - 1) {
-                                    px = !world.getBlock(worldX + 1, y, worldZ).isSolid() || !world.getBlock(worldX + 1, y, worldZ).isOpaque();
-                                }
-                                boolean ny = faceDefault;
-                                if (y > 0) {
-                                    ny = !world.getBlock(worldX, y - 1, worldZ).isSolid() || !world.getBlock(worldX, y - 1, worldZ).isOpaque();
-                                }
-                                boolean py = faceDefault;
-                                if (y < CHUNK_HEIGHT - 1) {
-                                    py = !world.getBlock(worldX, y + 1, worldZ).isSolid() || !world.getBlock(worldX, y + 1, worldZ).isOpaque();
-                                }
-                                boolean nz = faceDefault;
-                                if (worldZ > 0) {
-                                    nz = !world.getBlock(worldX, y, worldZ - 1).isSolid() || !world.getBlock(worldX, y, worldZ - 1).isOpaque();
-                                }
-                                boolean pz = faceDefault;
-                                if (worldZ < world.chunkLength * CHUNK_LENGTH - 1) {
-                                    pz = !world.getBlock(worldX, y, worldZ + 1).isSolid() || !world.getBlock(worldX, y, worldZ + 1).isOpaque();
-                                }
+                            boolean nx = faceDefault;
+                            if (worldX > 0) {
+                                nx = !world.getBlock(worldX - 1, y, worldZ).isSolid() || !world.getBlock(worldX - 1, y, worldZ).isOpaque();
+                            }
+                            boolean px = faceDefault;
+                            if (worldX < world.chunkWidth * CHUNK_WIDTH - 1) {
+                                px = !world.getBlock(worldX + 1, y, worldZ).isSolid() || !world.getBlock(worldX + 1, y, worldZ).isOpaque();
+                            }
+                            boolean ny = faceDefault;
+                            if (y > 0) {
+                                ny = !world.getBlock(worldX, y - 1, worldZ).isSolid() || !world.getBlock(worldX, y - 1, worldZ).isOpaque();
+                            }
+                            boolean py = faceDefault;
+                            if (y < CHUNK_HEIGHT - 1) {
+                                py = !world.getBlock(worldX, y + 1, worldZ).isSolid() || !world.getBlock(worldX, y + 1, worldZ).isOpaque();
+                            }
+                            boolean nz = faceDefault;
+                            if (worldZ > 0) {
+                                nz = !world.getBlock(worldX, y, worldZ - 1).isSolid() || !world.getBlock(worldX, y, worldZ - 1).isOpaque();
+                            }
+                            boolean pz = faceDefault;
+                            if (worldZ < world.chunkLength * CHUNK_LENGTH - 1) {
+                                pz = !world.getBlock(worldX, y, worldZ + 1).isSolid() || !world.getBlock(worldX, y, worldZ + 1).isOpaque();
+                            }
 
-                                if (y == CHUNK_HEIGHT - 1) {
-                                    py = false;
-                                }
+                            if (y == CHUNK_HEIGHT - 1) {
+                                py = false;
+                            }
 
-                                BlockGeometry.constructBlock(applet, textureManager, world.getBlock(worldX, y, worldZ), meshes[i], nx, px, ny, py, nz, pz, x, y, z);
+                            BlockGeometry.constructBlock(applet, textureManager, world.getBlock(worldX, y, worldZ), meshes[i], nx, px, ny, py, nz, pz, x, y, z);
+
+                            //meshes[i].tint(this.applet.map(world.getBlock(x, y, z).getLightLevel(), 0, 15, 50, 255));
+
+                        }
+                    }
+                }
+
+                meshes[i].endShape();
+
+
+//            for (int j = 0; j < meshes[i].getVertexCount(); j++) {
+//                //meshes[i].setFill(j, 0xff0000);
+//            }
+            }
+        }
+
+
+        for (int i = 0; i < chunkStackHeight; i++) {
+            if (subChunkDirtyList[i] == true) {
+                System.out.println("SubChunk: " + i + " is dirty.");
+                nonOpaqueMeshes[i] = this.applet.createShape();
+                nonOpaqueMeshes[i].beginShape(this.applet.TRIANGLE);
+                nonOpaqueMeshes[i].texture(this.textureManager.textureAtlas);
+                nonOpaqueMeshes[i].noStroke();
+                for (int x = 0; x < cwidth; x++) {
+                    for (int y = 0 + (i * cheight); y < cheight + (i * cheight); y++) {
+                        for (int z = 0; z < clength; z++) {
+
+                            PVector worldSpace = toWorldSpace(x, y, z);
+                            int worldX = (int) worldSpace.x;
+                            int worldZ = (int) worldSpace.z;
+
+                            if (world.getBlock(worldX, y, worldZ).isAir() || world.getBlock(worldX, y, worldZ).isOpaque() || !world.getBlock(worldX, y, worldZ).isGlassLike()) {
+                                continue;
+                            }
+
+                            boolean nx = faceDefault;
+                            if (worldX > 0) {
+                                nx = world.getBlock(worldX - 1, y, worldZ).isOpaque() || world.getBlock(worldX - 1, y, worldZ).isAir() || !world.getBlock(worldX - 1, y, worldZ).isGlassLike();
+                            }
+                            boolean px = faceDefault;
+                            if (worldX < world.chunkWidth * CHUNK_WIDTH - 1) {
+                                px = world.getBlock(worldX + 1, y, worldZ).isOpaque() || world.getBlock(worldX + 1, y, worldZ).isAir() || !world.getBlock(worldX + 1, y, worldZ).isGlassLike();
+                            }
+                            boolean ny = faceDefault;
+                            if (y > 0) {
+                                ny = world.getBlock(worldX, y - 1, worldZ).isOpaque() || world.getBlock(worldX, y - 1, worldZ).isAir() || !world.getBlock(worldX, y - 1, worldZ).isGlassLike();
+                            }
+                            boolean py = faceDefault;
+                            if (y < CHUNK_HEIGHT - 1) {
+                                py = world.getBlock(worldX, y + 1, worldZ).isOpaque() || world.getBlock(worldX, y + 1, worldZ).isAir() || !world.getBlock(worldX, y + 1, worldZ).isGlassLike();
+                            }
+                            boolean nz = faceDefault;
+                            if (worldZ > 0) {
+                                nz = world.getBlock(worldX, y, worldZ - 1).isOpaque() || world.getBlock(worldX, y, worldZ - 1).isAir() || !world.getBlock(worldX, y, worldZ - 1).isGlassLike();
+                            }
+                            boolean pz = faceDefault;
+                            if (worldZ < world.chunkLength * CHUNK_LENGTH - 1) {
+                                pz = world.getBlock(worldX, y, worldZ + 1).isOpaque() || world.getBlock(worldX, y, worldZ + 1).isAir() || !world.getBlock(worldX, y, worldZ + 1).isGlassLike();
+                            }
+
+                            if (y == CHUNK_HEIGHT - 1) {
+                                py = false;
+                            }
+
+                            BlockGeometry.constructBlock(applet, textureManager, world.getBlock(worldX, y, worldZ), nonOpaqueMeshes[i], nx, px, ny, py, nz, pz, x, y, z);
 
                             //meshes[i].tint(this.applet.map(world.getBlock(x, y, z).getLightLevel(), 0, 15, 50, 255));
 
@@ -191,10 +263,7 @@ public class Chunk {
                     }
                 }
             }
-            meshes[i].endShape();
-            for (int j = 0; j < meshes[i].getVertexCount(); j++) {
-                meshes[i].setFill(j, 0xff0000);
-            }
+            nonOpaqueMeshes[i].endShape();
 
             subChunkDirtyList[i] = false; // All clean!
         }
@@ -211,10 +280,16 @@ public class Chunk {
     }
 
 
-    public void draw(PGraphics graphics) {
+    public void draw(PGraphics graphics, PShader normalShader, PShader auxShader) {
         if (isDirty())
             regenerate();
         for (PShape mesh : meshes) {
+            graphics.shader(normalShader);
+            graphics.shape(mesh);
+
+        }
+        for(PShape mesh : nonOpaqueMeshes){
+            graphics.shader(normalShader);
             graphics.shape(mesh);
         }
     }

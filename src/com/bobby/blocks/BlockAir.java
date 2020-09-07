@@ -11,4 +11,9 @@ public class BlockAir extends Block {
         return false;
     }
     public boolean isOpaque() { return false; }
+
+    @Override
+    public boolean isAir() {
+        return true;
+    }
 }

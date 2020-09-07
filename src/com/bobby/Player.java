@@ -2,10 +2,14 @@ package com.bobby;
 
 import com.bobby.Math.Ray;
 import com.bobby.Math.RayCaster;
+import com.bobby.blocks.Block;
+import com.bobby.blocks.BlockManager;
+import com.bobby.blocks.BlockSandstone;
 import com.bobby.blocks.BlockStoneBrick;
 import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.core.PVector;
+import processing.event.MouseEvent;
 
 import java.util.HashMap;
 
@@ -17,7 +21,11 @@ public class Player {
     HashMap<Character, Boolean> keys;
     private float friction = 0.75f;
 
+    int curBlock = 0;
+
     float speed;
+
+    boolean gravityOn = false;
 
     public boolean onGround = false;
 
@@ -25,6 +33,7 @@ public class Player {
     World world;
 
     public Player(PApplet app, World world) {
+
         this.world = world;
         this.camera = new FirstPersonCamera(app, this);
         this.position = new PVector(0, 0, 0);
@@ -43,9 +52,48 @@ public class Player {
 
     }
 
-    public void update() {
+    public void drawGUI(PGraphics graphics, TextureManager manager){
+        graphics.fill(0,100,255);
+        //graphics.text(BlockManager.BLOCKS[curBlock].getName(), 10, graphics.height - 20);
+        int numBoxes = 17;
+        int boxSize = 40;
+        int pad = 2;
+        int barSize = boxSize * numBoxes + (numBoxes * pad);
 
-        speed = 1.5f * (1.0f / app.frameRate);
+        graphics.strokeWeight(pad);
+
+        graphics.noFill();
+        for (int i = 0; i < numBoxes; i++) {
+            graphics.stroke(0, 255, 128);
+            graphics.rect((graphics.width / 2) - (barSize / 2) + (i * boxSize + pad), graphics.height - (boxSize + pad) - 5, boxSize, boxSize);
+            if(i < BlockManager.BLOCKS.length)
+            graphics.image(manager.textureAtlas, (graphics.width / 2) - (barSize / 2) + (i * boxSize + pad), graphics.height - (boxSize  + pad) - 5, boxSize, boxSize, BlockManager.BLOCKS[i].texture.SIDES[0] * 16, BlockManager.BLOCKS[i].texture.SIDES[1] * 16, BlockManager.BLOCKS[i].texture.SIDES[0] * 16 + 16, BlockManager.BLOCKS[i].texture.SIDES[1] * 16 + 16  );
+
+        }
+
+        graphics.stroke(255);
+        graphics.rect((graphics.width / 2) - (barSize / 2) + ((curBlock % numBoxes) * boxSize + pad) - 5, graphics.height - (boxSize + pad) - 5 - 5, boxSize + 10, boxSize + 10);
+
+    }
+
+    public void mouseWheel(MouseEvent event){
+        this.curBlock += event.getCount();
+
+        if(curBlock > BlockManager.BLOCKS.length - 1){
+            curBlock = 0;
+        }
+
+        if(curBlock < 0){
+            curBlock = BlockManager.BLOCKS.length - 1;
+        }
+    }
+
+    public void update() {
+        if(this.app.keyPressed && this.app.keyCode == 16){
+            speed = 4.5f * (1.0f / app.frameRate);
+        }else {
+            speed = 1.5f * (1.0f / app.frameRate);
+        }
         if (keys.containsKey('a') && keys.get('a')) velocity.add(PVector.mult(camera.right, speed));
         if (keys.containsKey('d') && keys.get('d')) velocity.sub(PVector.mult(camera.right, speed));
         if (keys.containsKey('w') && keys.get('w')) velocity.add(PVector.mult(camera.forward, speed));
@@ -54,6 +102,11 @@ public class Player {
         if (keys.containsKey('e') && keys.get('e')) velocity.sub(PVector.mult(camera.up, speed));
         velocity.x *= friction;
         velocity.z *= friction;
+        if(gravityOn) {
+            this.velocity.add(new PVector(0, world.gravity * (1.0f / app.frameRate), 0));
+        }else{
+            velocity.y *= friction;
+        }
         position = this.checkCollisions(this.position.add(this.velocity));
 
         this.camera.update();
@@ -69,7 +122,7 @@ public class Player {
         PVector newPosition = position;
         float paddingP = 0.75f;
         float paddingN = 1 - paddingP;
-        this.velocity.add(new PVector(0, world.gravity * (1.0f / app.frameRate), 0));
+
 
         if (world.getBlock((int) position.x, (int) (position.y + 1.5f), (int) position.z).isSolid()) {
             this.velocity.y = 0;
@@ -123,6 +176,9 @@ public class Player {
             this.velocity.y += -7 * (1.0f / app.frameRate);
             onGround = false;
         }
+
+
+
     }
 
     public void keyReleased() {
@@ -143,7 +199,7 @@ public class Player {
             graphics.pushStyle();
             graphics.stroke(255);
             graphics.strokeWeight(3);
-            graphics.fill(0, 0, 255, 0);
+            //graphics.fill(0, 0, 255, 0);
             graphics.translate(0.5f + position.x, 0.5f + position.y, 0.5f + position.z);
             graphics.box(1.01f);
             graphics.popStyle();
@@ -181,7 +237,7 @@ public class Player {
                 } else if (app.mouseButton == app.RIGHT) {
                     if (!nPlayerPosition.equals(nPosition) && !nPlayerPositionPlusOne.equals(nPosition)) {
 
-                        world.setBlock(new BlockStoneBrick(), (int) position.x + (int) normal.x, (int) position.y + (int) normal.y, (int) position.z + (int) normal.z, true);
+                        world.setBlock(BlockManager.BLOCKS[curBlock], (int) position.x + (int) normal.x, (int) position.y + (int) normal.y, (int) position.z + (int) normal.z, true);
                         Light_Propogation.PropgateStrip(world, (int) position.x + (int) normal.x, (int) position.z + (int) normal.z);
                     }
                 }

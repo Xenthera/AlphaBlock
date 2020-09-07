@@ -7,5 +7,6 @@ public class BlockBedrock extends Block {
     public BlockBedrock() {
         super();
         texture = new BlockSingleTexture(1, 1);
+        this.name = "Bedrock";
     }
 }

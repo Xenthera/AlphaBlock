@@ -6,7 +6,7 @@ public class BlockPlantGrass extends Block{
 
     public BlockPlantGrass(){
         super();
-        this.name = "PlantGrass";
+        this.name = "Grass";
         this.renderType = BlockRenderType.SPRITE;
         this.texture = new BlockSingleTexture(7, 2);
 

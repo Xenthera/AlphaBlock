@@ -6,6 +6,7 @@ import com.bobby.blocks.BlockBedrock;
 import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.core.PVector;
+import processing.opengl.PShader;
 
 import java.util.ArrayList;
 
@@ -25,7 +26,7 @@ public class World {
     int z_blocks = chunkLength * 16;
     int y_blocks = 256;
     FastNoise fastNoise;
-    TextureManager textureManager;
+    public TextureManager textureManager;
 
     float progress = 0;
     String progressType = "";
@@ -216,6 +217,18 @@ public class World {
             }
         }
 
+        for (int x = 0; x < this.x_blocks; x++) {
+            for (int z = 0; z < this.z_blocks; z++) {
+                for (int y = 0; y < this.y_blocks; y++) {
+
+                    if(this.getBlock(x,y,z).getName() == "Air" && y > 170){
+                        this.setBlock(new BlockWater(), x, y, z, false);
+
+                    }
+                }
+            }
+        }
+
         Light_Propogation.PropogateWorld(this);
 
 //        for(Chunk chunk : this.chunks){
@@ -260,12 +273,12 @@ public class World {
         this.isLoading = false;
     }
 
-    public void draw(PGraphics graphics){
+    public void draw(PGraphics graphics, PShader normalShader, PShader auxShader){
         for (int i = 0; i < chunkWidth; i++) {
             for (int j = 0; j < chunkLength; j++) {
                 graphics.pushMatrix();
                 graphics.translate(i * 16, 0, j * 16);
-                chunks.get(i * chunkWidth + j).draw(graphics);
+                chunks.get(i * chunkWidth + j).draw(graphics, normalShader, auxShader);
                 graphics.popMatrix();
             }
         }

@@ -26,7 +26,6 @@ void main() {
 
     vec4 fragColor = texture2D(texture, vertTexCoord.st);
 
-
     //float frag_lighting = rand(vec2(0, frag_distance));
 
     if(fragColor.w == 0.0f){

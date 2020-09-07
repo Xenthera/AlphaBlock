@@ -21,6 +21,7 @@ public class Block {
     public Block() {
         this.lightLevel = 15;
         this.renderType = BlockRenderType.BLOCK;
+        name = this.toString();
     }
 
     public boolean isSolid() {
@@ -37,5 +38,13 @@ public class Block {
     public Block getBlock(int x){
         float y = 1;
         return new BlockFlower();
+    }
+
+    public boolean isAir(){
+        return false;
+    }
+
+    public boolean isGlassLike(){
+        return false;
     }
 }

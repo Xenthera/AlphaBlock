@@ -7,7 +7,7 @@ public class BlockDeadShrub extends Block{
 
     public BlockDeadShrub(){
         super();
-        this.name = "DeadShrub";
+        this.name = "Dead Shrub";
         this.renderType = BlockRenderType.SPRITE;
         this.texture = new BlockSingleTexture(7,3);
 

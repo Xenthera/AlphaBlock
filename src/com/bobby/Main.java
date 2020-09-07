@@ -3,6 +3,7 @@ package com.bobby;
 import com.bobby.blocks.*;
 import com.bobby.blocks.construction.BlockGeometry;
 import processing.core.*;
+import processing.event.MouseEvent;
 import processing.opengl.PGL;
 import processing.opengl.PGraphicsOpenGL;
 import processing.opengl.PJOGL;
@@ -17,7 +18,7 @@ public class Main extends PApplet{
 
     PJOGL pgl;
 
-    PShader blockShader, blockShaderUnlit, depthBufferShader;
+    PShader blockShader, blockShaderUnlit, depthBufferShader, blockBlackAndWhiteShader;
 
     PShape loadingMesh;
 
@@ -48,7 +49,7 @@ public class Main extends PApplet{
 
         //pg.textureSampling(3);
         depthBuffer = createGraphics(1024, 1024, P3D);
-        frame.setResizable(true);
+        surface.setResizable(true);
 
         font = loadFont("VCR48.vlw");
         textFont(font, 45);
@@ -58,9 +59,13 @@ public class Main extends PApplet{
 
         blockShader = loadShader("com/bobby/Shaders/Frag.glsl", "com/bobby/Shaders/Vert.glsl");
 
+        //blockBlackAndWhiteShader = loadShader("com/bobby/Shaders/FragBlackAndWhite.glsl", "com/bobby/Shaders/VertBlackAndWhite.glsl");
+
         blockShaderUnlit = loadShader("com/bobby/Shaders/FragUnlit.glsl", "com/bobby/Shaders/VertUnlit.glsl");
 
         depthBufferShader = loadShader("com/bobby/Shaders/FragDepth.glsl", "com/bobby/Shaders/VertDepth.glsl");
+
+
 
         if(!world.isLoaded){
             thread("loadWorldThread");
@@ -98,7 +103,7 @@ public class Main extends PApplet{
         pgl.frontFace(PGL.CCW);
         pgl.enable(PGL.CULL_FACE);
 
-        shader(blockShader);
+        shader(blockShaderUnlit);
         shape(this.loadingMesh);
         resetShader();
         endPGL();
@@ -141,8 +146,9 @@ public class Main extends PApplet{
         player.update();
         background(98, 144, 219);
         perspective(radians(90), (float)width/(float)height, 0.1f, 400);
-        shader(blockShader);
-        world.draw(this.getGraphics());
+        //shader(lightingEnabled ? blockShader : blockShaderUnlit);
+        //shader(lightingEnabled ? blockShader : depthBufferShader);
+        world.draw(this.getGraphics(), blockShader, depthBufferShader);
 
         player.draw(this.getGraphics());
 
@@ -182,6 +188,7 @@ public class Main extends PApplet{
         text("L: Lighting on/off", 10,82);
         text("F: Show Mouse", 10,100);
         profiler.draw(this, 10, 118);
+        player.drawGUI(this.getGraphics(), this.world.textureManager);
         popStyle();
     }
 
@@ -191,6 +198,7 @@ public class Main extends PApplet{
             player.camera.isMouseFocused = false;
         }else if(key == 'l'){
             lightingEnabled = !lightingEnabled;
+            System.out.println(lightingEnabled);
         }
     }
 
@@ -202,6 +210,9 @@ public class Main extends PApplet{
         player.mousePressed();
     }
 
+    public void mouseWheel(MouseEvent event){
+        player.mouseWheel(event);
+    }
 
     public static void main(String[] args) {
         PApplet.main("com.bobby.Main");

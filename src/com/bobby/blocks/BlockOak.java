@@ -9,5 +9,6 @@ public class BlockOak extends Block{
         texture.setTOP(5,1);
         texture.setBOTTOM(5,1);
         texture.setSIDES(4,1);
+        this.name = "Oak Log";
     }
 }

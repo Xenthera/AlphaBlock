@@ -5,7 +5,7 @@ import com.bobby.blocks.texture.BlockSingleTexture;
 public class BlockOakLeaves extends Block{
 
     public BlockOakLeaves(){
-        this.name = "Leaves";
+        this.name = "Oak Leaves";
         this.texture = new BlockSingleTexture(4,8);
     }
 
