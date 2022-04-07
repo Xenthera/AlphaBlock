@@ -2,10 +2,6 @@ package com.bobby;
 
 import com.bobby.Math.Ray;
 import com.bobby.Math.RayCaster;
-import com.bobby.blocks.Block;
-import com.bobby.blocks.BlockManager;
-import com.bobby.blocks.BlockSandstone;
-import com.bobby.blocks.BlockStoneBrick;
 import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.core.PVector;
@@ -66,8 +62,8 @@ public class Player {
         for (int i = 0; i < numBoxes; i++) {
             graphics.stroke(0, 255, 128);
             graphics.rect((graphics.width / 2) - (barSize / 2) + (i * boxSize + pad), graphics.height - (boxSize + pad) - 5, boxSize, boxSize);
-            if(i < BlockManager.BLOCKS.length)
-            graphics.image(manager.textureAtlas, (graphics.width / 2) - (barSize / 2) + (i * boxSize + pad), graphics.height - (boxSize  + pad) - 5, boxSize, boxSize, BlockManager.BLOCKS[i].texture.SIDES[0] * 16, BlockManager.BLOCKS[i].texture.SIDES[1] * 16, BlockManager.BLOCKS[i].texture.SIDES[0] * 16 + 16, BlockManager.BLOCKS[i].texture.SIDES[1] * 16 + 16  );
+            //if(i < Blocks.BLOCKS.length)
+            //graphics.image(manager.textureAtlas, (graphics.width / 2) - (barSize / 2) + (i * boxSize + pad), graphics.height - (boxSize  + pad) - 5, boxSize, boxSize, Blocks.BLOCKS[i].texture.SIDES[0] * 16, Blocks.BLOCKS[i].texture.SIDES[1] * 16, Blocks.BLOCKS[i].texture.SIDES[0] * 16 + 16, Blocks.BLOCKS[i].texture.SIDES[1] * 16 + 16  );
 
         }
 
@@ -79,12 +75,12 @@ public class Player {
     public void mouseWheel(MouseEvent event){
         this.curBlock += event.getCount();
 
-        if(curBlock > BlockManager.BLOCKS.length - 1){
+        if(curBlock > Blocks.BLOCKS.length - 1){
             curBlock = 0;
         }
 
         if(curBlock < 0){
-            curBlock = BlockManager.BLOCKS.length - 1;
+            curBlock = Blocks.BLOCKS.length - 1;
         }
     }
 
@@ -124,27 +120,27 @@ public class Player {
         float paddingN = 1 - paddingP;
 
 
-        if (world.getBlock((int) position.x, (int) (position.y + 1.5f), (int) position.z).isSolid()) {
+        if (Blocks.IsSolid(world.getBlock((int) position.x, (int) (position.y + 1.5f), (int) position.z))) {
             this.velocity.y = 0;
 
             this.position.y = (int) this.position.y + 0.5f;
             this.onGround = true;
         }
-        if (world.getBlock((int) position.x, (int) (position.y - 1), (int) position.z).isSolid()) {
+        if (Blocks.IsSolid(world.getBlock((int) position.x, (int) (position.y - 1), (int) position.z))) {
             float penetration = (int) this.position.y - this.position.y;
             if (-penetration < paddingN) {
                 this.velocity.y = 0;
                 newPosition.y += (paddingN + penetration);
             }
         }
-        if (world.getBlock((int) position.x + 1, (int) position.y, (int) position.z).isSolid() || world.getBlock((int) position.x + 1, (int) position.y + 1, (int) position.z).isSolid()) {
+        if (Blocks.IsSolid(world.getBlock((int) position.x + 1, (int) position.y, (int) position.z)) || Blocks.IsSolid(world.getBlock((int) position.x + 1, (int) position.y + 1, (int) position.z))) {
             float penetration = (this.position.x - (int) this.position.x) * 1;
             if (!(penetration < paddingP)) {
                 newPosition.x -= (penetration - paddingP) * 1;
             }
         }
 
-        if (world.getBlock((int) position.x - 1, (int) position.y, (int) position.z).isSolid() || world.getBlock((int) position.x - 1, (int) position.y + 1, (int) position.z).isSolid()) {
+        if (Blocks.IsSolid(world.getBlock((int) position.x - 1, (int) position.y, (int) position.z)) || Blocks.IsSolid(world.getBlock((int) position.x - 1, (int) position.y + 1, (int) position.z))) {
             //float penetration = (this.position.x - (int)this.position.x - 1) * 1;
             float penetration = (int) this.position.x - this.position.x;
             if (-penetration < paddingN) {
@@ -152,13 +148,13 @@ public class Player {
             }
         }
 
-        if (world.getBlock((int) position.x, (int) position.y, (int) position.z + 1).isSolid() || world.getBlock((int) position.x, (int) position.y + 1, (int) position.z + 1).isSolid()) {
+        if (Blocks.IsSolid(world.getBlock((int) position.x, (int) position.y, (int) position.z + 1)) || Blocks.IsSolid(world.getBlock((int) position.x, (int) position.y + 1, (int) position.z + 1))) {
             float penetration = (this.position.z - (int) this.position.z) * 1;
             if (!(penetration < paddingP)) {
                 newPosition.z -= (penetration - paddingP) * 1;
             }
         }
-        if (world.getBlock((int) position.x, (int) position.y, (int) position.z - 1).isSolid() || world.getBlock((int) position.x, (int) position.y + 1, (int) position.z - 1).isSolid()) {
+        if (Blocks.IsSolid(world.getBlock((int) position.x, (int) position.y, (int) position.z - 1)) || Blocks.IsSolid(world.getBlock((int) position.x, (int) position.y + 1, (int) position.z - 1))) {
             //float penetration = (this.position.x - (int)this.position.x - 1) * 1;
             float penetration = (int) this.position.z - this.position.z;
             if (-penetration < paddingN) {
@@ -195,15 +191,15 @@ public class Player {
         PVector vector = getSightVector();
         Ray ray = rayCaster.traceRay(this.position, vector, 80);
         PVector position = ray.getHitPostition();
-        if (ray.hasTarget()) {
-            graphics.pushStyle();
-            graphics.stroke(255);
-            graphics.strokeWeight(3);
-            //graphics.fill(0, 0, 255, 0);
-            graphics.translate(0.5f + position.x, 0.5f + position.y, 0.5f + position.z);
-            graphics.box(1.01f);
-            graphics.popStyle();
-        }
+//        if (ray.hasTarget()) {
+//            graphics.pushStyle();
+//            graphics.stroke(255);
+//            graphics.strokeWeight(3);
+//            //graphics.fill(0, 0, 255, 0);
+//            graphics.translate(0.5f + position.x, 0.5f + position.y, 0.5f + position.z);
+//            graphics.box(1.01f);
+//            graphics.popStyle();
+//        }
 
 
     }
@@ -233,12 +229,12 @@ public class Player {
 
                 if (app.mouseButton == app.LEFT) {
                     world.removeBlock((int) position.x, (int) position.y, (int) position.z, true);
-                    Light_Propogation.PropgateStrip(world, (int) position.x, (int) position.z);
+                    //Light_Propogation.PropgateStrip(world, (int) position.x, (int) position.z);
                 } else if (app.mouseButton == app.RIGHT) {
                     if (!nPlayerPosition.equals(nPosition) && !nPlayerPositionPlusOne.equals(nPosition)) {
 
-                        world.setBlock(BlockManager.BLOCKS[curBlock], (int) position.x + (int) normal.x, (int) position.y + (int) normal.y, (int) position.z + (int) normal.z, true);
-                        Light_Propogation.PropgateStrip(world, (int) position.x + (int) normal.x, (int) position.z + (int) normal.z);
+                        world.setBlock((short)curBlock, (int) position.x + (int) normal.x, (int) position.y + (int) normal.y, (int) position.z + (int) normal.z, true);
+                        //Light_Propogation.PropgateStrip(world, (int) position.x + (int) normal.x, (int) position.z + (int) normal.z);
                     }
                 }
             }

@@ -65,13 +65,15 @@ public class Main extends PApplet{
 
         depthBufferShader = loadShader("com/bobby/Shaders/FragDepth.glsl", "com/bobby/Shaders/VertDepth.glsl");
 
-
+        player.camera.centerMouse();
+        PVector spawn = world.getRandomSpawnPoint();
+        player.setPosition(spawn.x - 0.5f, spawn.y - 1.5f, spawn.z - 0.5f);
 
         if(!world.isLoaded){
             thread("loadWorldThread");
         }
-        Block loadingBlock = new BlockGrass();
-        Block loadingBlock2 = new BlockFlower();
+        int loadingBlock = Blocks.GRASS;
+        int loadingBlock2 = Blocks.FLOWER;
         loadingMesh = createShape();
         loadingMesh.beginShape(PConstants.TRIANGLE);
         loadingMesh.texture(world.textureManager.getTextureAtlas());
@@ -84,9 +86,7 @@ public class Main extends PApplet{
 
     public void loadWorldThread(){
         world.load();
-        player.camera.centerMouse();
-        PVector spawn = world.getRandomSpawnPoint();
-        player.setPosition(spawn.x - 0.5f, spawn.y - 1.5f, spawn.z - 0.5f);
+
     }
 
     void loadingDraw(){
@@ -132,10 +132,6 @@ public class Main extends PApplet{
         float lightAngle = frameCount * 0.002f;
         lightDir.set(sin(lightAngle) * 160, 160, cos(lightAngle) * 160);
 
-        if(world.isLoading){
-            loadingDraw();
-            return;
-        }
 
         //--------------------------------
         //Main Pass

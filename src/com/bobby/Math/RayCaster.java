@@ -1,5 +1,6 @@
 package com.bobby.Math;
 
+import com.bobby.Blocks;
 import com.bobby.Chunk;
 import com.bobby.World;
 import com.bobby.blocks.Block;
@@ -100,23 +101,20 @@ public class RayCaster {
 
             // exit check
 
-                Block block = this.world.getBlock(ix,iy,iz);
-                if(block == null){
+                int block = this.world.getBlock(ix,iy,iz);
 
-                }else {
+                if (this.world.getBlock(ix, iy, iz) != Blocks.AIR) {
+                    ray.hitPostition.x = ix;
+                    ray.hitPostition.y = iy;
+                    ray.hitPostition.z = iz;
 
-                    if (this.world.getBlock(ix, iy, iz).getName() != "Air") {
-                        ray.hitPostition.x = ix;
-                        ray.hitPostition.y = iy;
-                        ray.hitPostition.z = iz;
-
-                        if (steppedIndex == 0) ray.hitNormal.x = -stepx;
-                        if (steppedIndex == 1) ray.hitNormal.y = -stepy;
-                        if (steppedIndex == 2) ray.hitNormal.z = -stepz;
-                        ray.hitTarget = true;
-                        return ray;
-                    }
+                    if (steppedIndex == 0) ray.hitNormal.x = -stepx;
+                    if (steppedIndex == 1) ray.hitNormal.y = -stepy;
+                    if (steppedIndex == 2) ray.hitNormal.z = -stepz;
+                    ray.hitTarget = true;
+                    return ray;
                 }
+
                 // advance t to next nearest voxel boundary
                 if (txMax < tyMax) {
                     if (txMax < tzMax) {
