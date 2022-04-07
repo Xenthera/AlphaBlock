@@ -24,8 +24,8 @@ public class World {
 
     ConcurrentHashMap<Tuple, Chunk> chunks;
     //Temporary hard-coded values
-    int chunkWidth = 10;
-    int chunkLength = 10;
+    int chunkWidth = 32;
+    int chunkLength = 32;
     boolean isLoaded = false;
     boolean isLoading = false;
     int x_blocks = chunkWidth * 16;
@@ -112,17 +112,22 @@ public class World {
         for (int x = 0; x < chunkWidth; x++) {
             for (int z = 0; z < chunkLength; z++) {
                 Chunk chunk = new Chunk(applet, this, x, z);
-                //chunk.regenerate();
                 chunks.put(new Tuple(x, z), chunk);
-                try {
-                    Thread.sleep(1000/40);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+
+                
 
                 chunkCount++;
             }
         }
+        for (Map.Entry<Tuple, Chunk> set : chunks.entrySet()) {
+            try {
+                Thread.sleep(1000/20);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            set.getValue().regenerate();
+        }
+
         chunkCount = 0;
         float frequency = 4.0f;
 

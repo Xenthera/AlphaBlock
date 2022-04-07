@@ -13,12 +13,22 @@ import processing.core.PVector;
 import processing.opengl.PShader;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Chunk {
 
     private PApplet applet;
 
-    //FastNoise fastNoise;
+    public static FastNoise fastNoise = new FastNoise();
+    public static Random random;
+
+
+    static {
+        random = new Random();
+        fastNoise.SetSeed(random.nextInt(Integer.MAX_VALUE));
+        fastNoise.SetNoiseType(FastNoise.NoiseType.SimplexFractal);
+        fastNoise.SetFractalOctaves(2);
+    }
 
     private PShape meshes[];
 
@@ -39,17 +49,21 @@ public class Chunk {
 
     boolean[] subChunkDirtyList; // Flag to check if subchunk needs rebuilding
 
-
+    public static int GetBlock(Chunk c, int x, int y, int z){
+        if(c != null){
+            return c.getBlock(x,y,z);
+        }
+        else{
+            return Blocks.AIR;
+        }
+    }
 
     public Chunk(PApplet applet, World world, int x, int y) {
 
         this.world = world;
 
         this.position = new Tuple(x, y);
-        //fastNoise = new FastNoise();
-        //fastNoise.SetSeed((int)applet.random(Integer.MAX_VALUE));
-        //fastNoise.SetNoiseType(FastNoise.NoiseType.SimplexFractal);
-        //fastNoise.SetFractalOctaves(2);
+
 
         this.applet = applet;
 
@@ -78,34 +92,40 @@ public class Chunk {
             for (int j = 0; j < CHUNK_HEIGHT; j++) {
                 for (int k = 0; k < CHUNK_LENGTH; k++) {
 
-                    int worldX = i + (CHUNK_WIDTH * x);
-                    int worldZ = j + (CHUNK_LENGTH * y);
-                    double ypos = Math.sin(worldX * 0.25) * 15;
-                    int yy = CHUNK_HEIGHT - (int)ypos - 61;
-                    if(j >= yy)
-                    this.setBlock(Blocks.OAK, i, j, k, false);
+//                    int worldX = i + (CHUNK_WIDTH * x);
+//                    int worldZ = j + (CHUNK_LENGTH * y);
+//                    double ypos = Math.sin(worldX * 0.25) * 15;
+//                    int yy = CHUNK_HEIGHT - (int)ypos - 61;
+//                    if(j >= yy)
+                    //if(i % 2 == 0)
+                    //this.setBlock(Blocks.OAK, i, j, k, false);
 
-//                    float rand = applet.pow(j / ((float)CHUNK_HEIGHT) * 4, 1.1024f) + fastNoise.GetValueFractal((i + (CHUNK_WIDTH * position.x)) * frequency, j * frequency, (k + (CHUNK_LENGTH * position.y)) * frequency) * 0.60f;
-//                    if (rand > 0.5f)
-//                    {
-//                        this.setBlock(Blocks.BIRCH_LEAVES, i, j + 120, k, false);
-//                    }
+                    int worldX = (i + (CHUNK_WIDTH * position.x));
+                    int worldY = j;
+                    int worldZ = (k + (CHUNK_LENGTH * position.y));
+
+
+                    float rand = applet.pow(j / ((float)CHUNK_HEIGHT) * 4, 1.1024f) + fastNoise.GetValueFractal(worldX * frequency, j * frequency, worldZ * frequency) * 0.60f;
+                    if (rand > 0.5f)
+                    {
+                        this.setBlock(Blocks.STONE, i, j + 120, k, false);
+                    }
 //
 //
 //
-//                    if(j == 254){
-//                        if(applet.random(1) >= .5f){
-//                            this.setBlock(Blocks.BEDROCK, i, j, k, false);
-//                        }
-//                    }
+                    if(j == 254){
+                        if(applet.random(1) >= .5f){
+                            this.setBlock(Blocks.BEDROCK, i, j, k, false);
+                        }
+                    }
+
+                    if(j == 255){
+                        this.setBlock(Blocks.BEDROCK, i, j, k, false);
+                    }
 //
-//                    if(j == 255){
-//                        this.setBlock(Blocks.BEDROCK, i, j, k, false);
-//                    }
-//
-//                    if(this.getBlock(i,j,k) != Blocks.AIR){
+
 //                        if(y / ((float)this.CHUNK_HEIGHT) > 0.65f){
-//                            if(fastNoise.GetValueFractal(i * frequency * 5, k * frequency * 5) >= -0.2){
+//                            if(fastNoise.GetValueFractal(worldX * frequency * 5, worldZ * frequency * 5) >= -0.2){
 //                                this.setBlock(Blocks.SAND, i,j,k,false);
 //                                this.setBlock(Blocks.SANDSTONE, i,j + 1,k,false);
 //                                this.setBlock(Blocks.SANDSTONE, i,j + 2,k,false);
@@ -117,16 +137,10 @@ public class Chunk {
 //                                this.setBlock(Blocks.GRAVEL, i,j + 3,k,false);
 //                            }
 //                        }else{
-//                            this.setBlock(Blocks.GRASS, i,j,k, false);
-//                            this.setBlock(Blocks.DIRT, i,j + 1,k,false);
-//                            this.setBlock(Blocks.DIRT, i,j + 2,k,false);
-//                            this.setBlock(Blocks.DIRT, i,j + 3,k,false);
-//                            if(applet.random(1) < 0.4) {
-//                                this.setBlock(Blocks.PLANT_GRASS, i, j - 1, k, false);
-//                            }
-//                        }
-//                        break;
-//                    }
+
+                        //}
+
+
 
 
                 }
@@ -134,6 +148,36 @@ public class Chunk {
             }
         }
 
+
+        for (int i = 0; i < CHUNK_WIDTH; i++) {
+            for (int k = 0; k < CHUNK_LENGTH; k++) {
+
+                for (int j = 0; j < CHUNK_HEIGHT; j++) {
+                    if(getBlock(i,j,k) == Blocks.AIR){
+                        continue;
+                    }else{
+                        setBlock(Blocks.GRASS, i, j, k, false);
+                        setBlock(Blocks.DIRT, i, j + 1, k, false);
+                        setBlock(Blocks.DIRT, i, j + 2, k, false);
+                        setBlock(Blocks.DIRT, i, j + 3, k, false);
+                        if(random.nextInt(10) < 2)
+                        setBlock(Blocks.PLANT_GRASS, i, j - 1, k, false);
+                        break;
+                    }
+                }
+
+            }
+        }
+    }
+
+    private boolean canBlockSeeSky(int x, int y, int z){
+        for (int i = y - 1; i >= 0 ; i--) {
+            if(getBlock(x,i,z) != Blocks.AIR){
+
+                return false;
+            }
+        }
+        return true;
     }
 
 
@@ -224,6 +268,13 @@ public class Chunk {
 
 
         boolean faceDefault = true;
+        Chunk cnx = world.getChunk(this.position.x - 1, this.position.y);
+        Chunk cpx = world.getChunk(this.position.x + 1, this.position.y);
+
+        Chunk cny = world.getChunk(this.position.x, this.position.y - 1);
+        Chunk cpy = world.getChunk(this.position.x, this.position.y + 1);
+
+
         for (int i = 0; i < chunkStackHeight; i++) {
             if (subChunkDirtyList[i] == true) { // If the chunk is dirty?
                 meshes[i] = this.applet.createShape();
@@ -243,10 +294,14 @@ public class Chunk {
                             boolean nx = faceDefault;
                             if (x > 0) {
                                 nx = !Blocks.IsSolid(getBlock(x - 1, y, z)) || !Blocks.IsOpaque(getBlock(x - 1, y, z));
+                            }else{
+                                nx = !Blocks.IsSolid(GetBlock(cnx,CHUNK_WIDTH - 1, y, z)) || !Blocks.IsOpaque(GetBlock(cnx,CHUNK_WIDTH - 1, y, z));
                             }
                             boolean px = faceDefault;
                             if (x < CHUNK_WIDTH - 1) {
-                                px = !Blocks.IsSolid(getBlock(x + 1, y, z)) || !Blocks.IsOpaque(getBlock(x + 1, y, z));
+                                px = !Blocks.IsSolid(getBlock(0, y, z)) || !Blocks.IsOpaque(getBlock(x + 1, y, z));
+                            }else{
+                                px = !Blocks.IsSolid(GetBlock(cpx,0, y, z)) || !Blocks.IsOpaque(GetBlock(cpx,0, y, z));
                             }
                             boolean ny = faceDefault;
                             if (y > 0) {
@@ -259,10 +314,14 @@ public class Chunk {
                             boolean nz = faceDefault;
                             if (z > 0) {
                                 nz = !Blocks.IsSolid(getBlock(x, y, z - 1)) || !Blocks.IsOpaque(getBlock(x, y, z - 1));
+                            }else{
+                                nz = !Blocks.IsSolid(GetBlock(cny,x, y, CHUNK_LENGTH - 1))|| !Blocks.IsOpaque(GetBlock(cny,x, y, CHUNK_LENGTH - 1));
                             }
                             boolean pz = faceDefault;
                             if (z < CHUNK_LENGTH - 1) {
                                 pz = !Blocks.IsSolid(getBlock(x, y, z + 1)) || !Blocks.IsOpaque(getBlock(x, y, z + 1));
+                            }else{
+                                pz = !Blocks.IsSolid(GetBlock(cpy,x, y, 0))|| !Blocks.IsOpaque(GetBlock(cpy,x, y, 0));
                             }
 
                             if (y == CHUNK_HEIGHT - 1) {
@@ -365,12 +424,13 @@ public class Chunk {
     public void draw(PGraphics graphics, PShader normalShader, PShader auxShader) {
 
         if (isDirty()) {
-            regenerate();
+            //regenerate();
         }
         for (PShape mesh : meshes) {
             graphics.shader(normalShader);
-            graphics.shape(mesh);
-
+            if(mesh != null) {
+                graphics.shape(mesh);
+            }
         }
 //        for(PShape mesh : nonOpaqueMeshes){
 //            graphics.shader(normalShader);
